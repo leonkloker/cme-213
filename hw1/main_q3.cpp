@@ -10,26 +10,31 @@
 class Matrix {
  public:
   virtual ~Matrix() = 0;
+  virtual std::string repr() const = 0;
 };
 
 Matrix::~Matrix() {}
 
 /* TODO: Modify the following classes so that the code runs as expected */
 
-class SparseMatrix {
+class SparseMatrix : public Matrix{
  public:
-  std::string repr() { return "sparse"; }
+  std::string repr() const override { return "sparse"; }
 };
 
-class ToeplitzMatrix {
+class ToeplitzMatrix : public Matrix{
  public:
-  std::string repr() { return "toeplitz"; }
+  std::string repr() const override { return "toeplitz"; }
 };
 
 /* TODO: This function should accept a vector of Matrices and call the repr
  * function on each matrix, printing the result to the standard output.
  */
-void PrintRepr(const std::vector<std::shared_ptr<Matrix>> &vec) {}
+void PrintRepr(const std::vector<std::shared_ptr<Matrix>> &vec) {
+  for (auto m : vec){
+    std::cout << (*m).repr() << " ";
+  }
+}
 
 /* This fills a vector with an instance of SparseMatrix
  * and an instance of ToeplitzMatrix and passes the resulting vector

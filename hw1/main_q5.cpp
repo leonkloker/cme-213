@@ -8,8 +8,12 @@
 /**********  Q5a: DAXPY **********/
 template <typename T>
 std::vector<T> daxpy(T a, const std::vector<T>& x, const std::vector<T>& y) {
-  // TODO
-  return std::vector<T>();
+  if (x.size() != y.size()) {
+    throw std::invalid_argument("Vectors not compatible");
+  }
+  std::vector<T> res(x.size());
+  std::transform(x.begin(), x.end(), y.begin(), res.begin(), [a](T x, T y){return a * x + y;});
+  return res;
 }
 
 /**********  Q5b: All students passed **********/
@@ -28,13 +32,18 @@ struct Student {
 
 bool all_students_passed(const std::vector<Student>& students,
                          double pass_threshold) {
-  // TODO
-  return false;
+  return std::all_of(students.begin(), students.end(), [pass_threshold](Student s) {
+    return (s.homework * HOMEWORK_WEIGHT + s.midterm * MIDTERM_WEIGHT + s.final_exam * FINAL_EXAM_WEIGHT) 
+    >= pass_threshold;});
 }
 
 /**********  Q5c: Odd first, even last **********/
 void sort_odd_even(std::vector<int>& data) {
-  // TODO
+  return std::sort(data.begin(), data.end(), [](int a, int b) {
+    if (a%2 == 0 && b%2 != 0) return false;
+    else if (a%2 != 0 && b%2 == 0) return true;
+    else return a < b;
+  });
 }
 
 /**********  Q5d: Sparse matrix list sorting **********/
@@ -49,11 +58,20 @@ struct SparseMatrixCoordinate {
   bool operator==(const SparseMatrixCoordinate& b) const {
     return (row == b.row) && (col == b.col) && (data == b.data);
   }
+
+  bool operator<(const SparseMatrixCoordinate& b) const {
+    if (row < b.row) return true;
+    if (row > b.row) return false;
+    if (col < b.col) return true;
+    if (col > b.col) return false;
+    if (data <= b.data) return true;
+    else return false;
+  }
 };
 
 template <typename T>
 void sparse_matrix_sort(std::list<SparseMatrixCoordinate<T>>& list) {
-  // TODO
+  list.sort();
 }
 
 int main() {

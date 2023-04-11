@@ -72,6 +72,16 @@ TEST(testMatrix, mnx11) {
   EXPECT_EQ(A.dot(B)(2,3), 8);
 }
 
+TEST(testMatrix, print){
+  Matrix2D<float> A(3,4);
+  for (int i = 0; i < 3; i++){
+    for (int j = 0; j < 4; j++){
+      A(i,j) = i*j;
+    }
+  }
+  std::cout << A;
+}
+
 /*
 TODO:
 Test your implementation by writing tests that cover most scenarios of 2D matrix

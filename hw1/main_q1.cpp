@@ -39,6 +39,14 @@ TEST(testMatrix, symmetricTest) {
   s << m4;
 }
 
+TEST(testMatrix, symmetricPrint) {
+  MatrixSymmetric<float> A(5);
+  for (int i = 0; i < 5; i++){
+    A(i,0) = i;
+  } 
+  std::cout << A;
+}
+
 TEST(testMatrix, diagonalTest) {
 
   MatrixDiagonal<float> m1;
@@ -70,6 +78,14 @@ TEST(testMatrix, diagonalTest) {
 
   std::stringstream s;
   s << m4;
+}
+
+TEST(testMatrix, diagonalPrint) {
+  MatrixDiagonal<float> A(5);
+  for (int i = 0; i < 5; i++){
+    A(i,i) = i;
+  } 
+  std::cout << A;
 }
 
 /*

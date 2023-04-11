@@ -6,8 +6,14 @@
 
 // TODO: add your function here. The function should count the number of
 // entries between lb and ub.
-unsigned int count_range(const std::set<double>& data, const double lb,
-                         const double ub) {}
+unsigned int count_range(const std::set<double>& data, const double lb, const double ub) {
+  if (lb > ub) throw std::invalid_argument("Lower bound is larger than upper bound");
+
+  std::set<double>::iterator itl = data.lower_bound(lb);
+  std::set<double>::iterator itu = data.upper_bound(ub);
+  
+  return std::distance(itl, itu);
+}
 
 int main() {
   std::set<double> data_simple{0, 1, 2, 3, 4, 5, 6};
