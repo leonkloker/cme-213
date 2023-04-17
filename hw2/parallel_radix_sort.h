@@ -25,8 +25,13 @@ std::vector<uint> computeBlockHistograms(
     uint startBit, 
     uint blockSize
 ) {
+    if (numBuckets != 1 << numBits) throw std::invalid_argument("numBuckets and numBits are incompatible");
+    if (blockSize != keys.size() / numBlocks) throw std::invalid_argument("blockSize and numBlocks are incompatible");
     std::vector<uint> blockHistograms(numBlocks * numBuckets, 0);
-    // TODO
+    #pragma omp parallel for
+    for (uint block = 0; block < numBlocks; block++){
+        
+    }
     return blockHistograms;
 }
 
