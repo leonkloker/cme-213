@@ -26,13 +26,14 @@ std::vector<uint> computeBlockHistograms(
     uint blockSize
 ) {
     if (numBuckets != (uint)1 << numBits) throw std::invalid_argument("numBuckets and numBits are incompatible");
-    if (blockSize != (uint)keys.size() / numBlocks) throw std::invalid_argument("blockSize and numBlocks are incompatible");
+    if (blockSize * numBlocks < (uint)keys.size()) throw std::invalid_argument("blockSize and numBlocks are incompatible");
 
     std::vector<uint> blockHistograms(numBlocks * numBuckets, 0);
 
     #pragma omp parallel for
     for (uint block = 0; block < numBlocks; block++){
         for (uint i = block * blockSize; i < (block + 1) * blockSize; i++){
+            if (i >= keys.size()) break;
             uint bucket = (keys[i] >> startBit) & (numBuckets - 1);
             blockHistograms[block * numBuckets + bucket]++;
         }
@@ -119,6 +120,7 @@ void populateOutputFromBlockExScan(
     for (uint block = 0; block < numBlocks; block++){
         std::vector<uint> offsets(numBuckets, 0);
         for (uint i = block * blockSize; i < (block + 1) * blockSize; i++){
+            if (i >= keys.size()) break;
             uint bucket = (keys[i] >> startBit) & (numBuckets - 1);
             sorted[blockExScan[block * numBuckets + bucket] + offsets[bucket]] = keys[i];
             offsets[bucket]++;
