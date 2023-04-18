@@ -25,12 +25,17 @@ std::vector<uint> computeBlockHistograms(
     uint startBit, 
     uint blockSize
 ) {
-    if (numBuckets != 1 << numBits) throw std::invalid_argument("numBuckets and numBits are incompatible");
-    if (blockSize != keys.size() / numBlocks) throw std::invalid_argument("blockSize and numBlocks are incompatible");
+    if (numBuckets != (uint)1 << numBits) throw std::invalid_argument("numBuckets and numBits are incompatible");
+    if (blockSize != (uint)keys.size() / numBlocks) throw std::invalid_argument("blockSize and numBlocks are incompatible");
+
     std::vector<uint> blockHistograms(numBlocks * numBuckets, 0);
+
     #pragma omp parallel for
     for (uint block = 0; block < numBlocks; block++){
-        
+        for (uint i = block * blockSize; i < (block + 1) * blockSize; i++){
+            uint bucket = (keys[i] >> startBit) & (numBuckets - 1);
+            blockHistograms[block * numBuckets + bucket]++;
+        }
     }
     return blockHistograms;
 }
@@ -46,7 +51,11 @@ std::vector<uint> reduceLocalHistoToGlobal(
     uint numBuckets
 ) {
     std::vector<uint> globalHisto(numBuckets, 0);
-    // TODO
+    for (uint bucket = 0; bucket < numBuckets; bucket++){
+        for (uint block = 0; block < numBlocks; block++){
+            globalHisto[bucket] += blockHistograms[block * numBuckets + bucket];
+        }
+    }
     return globalHisto;
 }
 
@@ -59,7 +68,9 @@ std::vector<uint> scanGlobalHisto(
     uint numBuckets
 ) {
     std::vector<uint> globalHistoExScan(numBuckets, 0);
-    // TODO
+    for (uint bucket = 1; bucket < numBuckets; bucket++){
+        globalHistoExScan[bucket] = globalHisto[bucket - 1] + globalHistoExScan[bucket - 1];
+    }
     return globalHistoExScan;
 }
 
@@ -76,7 +87,16 @@ std::vector<uint> computeBlockExScanFromGlobalHisto(
     const std::vector<uint> &blockHistograms
 ) {
     std::vector<uint> blockExScan(numBuckets * numBlocks, 0);
-    // TODO
+    for (uint bucket = 0; bucket < numBuckets; bucket++){
+        blockExScan[bucket] = globalHistoExScan[bucket];
+    }
+
+    for (uint block = 1; block < numBlocks; block++){
+        for (uint bucket = 0; bucket < numBuckets; bucket++){
+            blockExScan[block * numBuckets + bucket] = blockHistograms[(block - 1) * numBuckets + bucket] 
+            + blockExScan[(block - 1) * numBuckets + bucket];
+        }
+    }
     return blockExScan;
 }
 
@@ -95,7 +115,15 @@ void populateOutputFromBlockExScan(
     const std::vector<uint> &keys,
     std::vector<uint> &sorted
 ) {
-    // TODO
+    #pragma omp parallel for
+    for (uint block = 0; block < numBlocks; block++){
+        std::vector<uint> offsets(numBuckets, 0);
+        for (uint i = block * blockSize; i < (block + 1) * blockSize; i++){
+            uint bucket = (keys[i] >> startBit) & (numBuckets - 1);
+            sorted[blockExScan[block * numBuckets + bucket] + offsets[bucket]] = keys[i];
+            offsets[bucket]++;
+        }
+    }
 }
 
 /* Function: radixSortParallelPass
@@ -152,9 +180,11 @@ int radixSortParallel(
 
 void runBenchmark(std::vector<uint>& keys_parallel, std::vector<uint>& temp_keys, uint kNumBits, uint n_blocks, uint n_threads){
     // TODO: Call omp_set_num_threads() with the correct argument
+    omp_set_num_threads(n_threads);
 
     double startRadixParallel = omp_get_wtime();
     // TODO: Call radixSortParallel() with the correct arguments
+    radixSortParallel(keys_parallel, temp_keys, kNumBits, n_blocks);
 
     double endRadixParallel = omp_get_wtime();
 
