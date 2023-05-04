@@ -51,13 +51,13 @@ main_q3: main_q3.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
 run1: main_q1
-	srun --partition=CME --gres=gpu:1 ./main_q1
+	srun --partition=CME --qos=cme --gres=gpu:1 ./main_q1
 
 run2: main_q2
-	srun --partition=CME --gres=gpu:1 ./main_q2
+	srun --partition=CME --qos=cme --gres=gpu:1 ./main_q2
 
 run3: main_q3
-	srun --partition=CME --gres=gpu:1 ./main_q3
+	srun --partition=CME --qos=cme --gres=gpu:1 ./main_q3
 
 clean:
 	rm -f *.o *~ *~ main_q1 main_q2 main_q3

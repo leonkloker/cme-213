@@ -80,14 +80,13 @@ class RecurrenceTestFixture : public ::testing::Test {
     device_input_array = nullptr;
     device_output_array = nullptr;
 
-    // TODO: allocate num_bytes of memory to the device arrays.
-    // Hint: use cudaMalloc
-
+    cudaMalloc(&device_input_array, num_bytes);
+    cudaMalloc(&device_output_array, num_bytes);
   }
 
-  // TODO: deallocate memory from both device arrays
   ~RecurrenceTestFixture() {
-
+    cudaFree(device_input_array);
+    cudaFree(device_output_array);
   }
 
   void initialize() {

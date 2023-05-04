@@ -17,7 +17,7 @@ echo Output from main_q1
 echo ----------------
 ./main_q1
 
-echo
+'''echo
 echo Output from main_q2
 echo ----------------
 ./main_q2
@@ -25,4 +25,4 @@ echo ----------------
 echo
 echo Output from main_q3
 echo ----------------
-./main_q3
+./main_q3'''
