@@ -7,7 +7,12 @@
 __global__ void elementwise_add(const int *x, const int *y,
                                 int *z, unsigned int stride,
                                 unsigned int size) {
-    // TODO: elementwise_add should compute
+    
+    size_t id = blockIdx.x * blockDim.x + threadIdx.x;
+    if (id < size){
+        z[id * stride] = x[id * stride] + y[id * stride];
+    }
+
     // z[i * stride] = x[i * stride] + y[i * stride]
     // where i goes from 0 to size-1.
     // Distribute the work across all CUDA threads allocated by

@@ -152,8 +152,8 @@ TEST(testQ2, testPageRank) {
   // initalize CUDA and warmup kernel to avoid including these costs in the
   // timings
   cudaFree(0);
-  device_graph_propagate<<<1, 1>>>(nullptr, nullptr, nullptr, nullptr, nullptr,
-                                   0);
+
+  device_graph_propagate<<<1, 1>>>(nullptr, nullptr, nullptr, nullptr, nullptr, 0);
 
   std::vector<uint> num_nodes;
   std::vector<uint> avg_edges;
@@ -183,7 +183,6 @@ TEST(testQ2, testPageRank) {
 
   for (const uint node : num_nodes) std::cout << std::setw(15) << node;
   std::cout << std::endl;
-
   std::cout << std::setw(16) << "Avg. no. edges\n";
 
   for (const uint edge : avg_edges) {

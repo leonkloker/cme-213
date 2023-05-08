@@ -17,9 +17,9 @@ GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
 
 GTEST_SRCS_ = $(GTEST_DIR)/src/*.cc $(GTEST_DIR)/src/*.h $(GTEST_HEADERS)
 
-.PHONY: default run3 clean
+.PHONY: default run1 run2 run3 clean
 
-default: main_q3
+default: main_q1 main_q2 main_q3
 
 gtest-all.o : $(GTEST_SRCS_)
 	$(CXX) $(CPPFLAGS) -I$(GTEST_DIR) $(CXXFLAGS) -c \
