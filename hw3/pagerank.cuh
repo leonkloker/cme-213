@@ -19,8 +19,8 @@ __global__ void device_graph_propagate(const uint *graph_indices,
 
     size_t id = blockIdx.x * blockDim.x + threadIdx.x;
     while (id < num_nodes) {
-        graph_nodes_out[id] = 1 / (2 * num_nodes);
-        for (int i = graph_indices[id]; i < graph_indices[id]+1; i++) {
+        graph_nodes_out[id] = 1 / (float) (2 * num_nodes);
+        for (int i = graph_indices[id]; i < graph_indices[id+1]; i++) {
             graph_nodes_out[id] += 0.5 * graph_nodes_in[graph_edges[i]] * inv_edges_per_node[graph_edges[i]];
         }
         id += blockDim.x * gridDim.x;
@@ -73,11 +73,11 @@ double device_graph_iterate(
     float *d_gpu_node_values_output = nullptr;
     float *d_inv_edges_per_node = nullptr;
 
-    cudaMalloc((void**) &d_graph_indices, (num_nodes+1) * sizeof(uint));
-    cudaMalloc((void**) &d_graph_edges, num_nodes * avg_edges * sizeof(uint));
-    cudaMalloc((void**) &d_node_values_input, num_nodes * sizeof(float));
-    cudaMalloc((void**) &d_gpu_node_values_output, num_nodes * sizeof(float));
-    cudaMalloc((void**) &d_inv_edges_per_node, num_nodes * sizeof(float));
+    cudaMalloc(&d_graph_indices, (num_nodes+1) * sizeof(uint));
+    cudaMalloc(&d_graph_edges, num_nodes * avg_edges * sizeof(uint));
+    cudaMalloc(&d_node_values_input, num_nodes * sizeof(float));
+    cudaMalloc(&d_gpu_node_values_output, num_nodes * sizeof(float));
+    cudaMalloc(&d_inv_edges_per_node, num_nodes * sizeof(float));
 
     // TODO: check for allocation failure
     if (cudaPeekAtLastError() != 0){
@@ -91,10 +91,6 @@ double device_graph_iterate(
     cudaMemcpy(d_gpu_node_values_output, h_gpu_node_values_output, num_nodes * sizeof(float), cudaMemcpyHostToDevice);
     cudaMemcpy(d_inv_edges_per_node, h_inv_edges_per_node, num_nodes * sizeof(float), cudaMemcpyHostToDevice);
 
-    if (cudaPeekAtLastError() != 0){
-        std::cout << cudaGetLastError() << std::endl << std::flush;
-    }
-
     // launch kernels
     event_pair timer;
     start_timer(&timer);
@@ -103,14 +99,13 @@ double device_graph_iterate(
 
     // TODO: launch your kernels the appropriate number of iterations
     for (unsigned int i = 0; i < nr_iterations; i++) {
-        
         device_graph_propagate<<<ceil(num_nodes / block_size), block_size>>>(
         d_graph_indices, d_graph_edges, d_node_values_input, 
         d_gpu_node_values_output, d_inv_edges_per_node, num_nodes);
         cudaDeviceSynchronize();
-        std::cout << "Iteration " << i << std::endl << std::flush;
-        std::copy(d_gpu_node_values_output, d_gpu_node_values_output + 1, d_node_values_input);
+        std::swap(d_node_values_input, d_gpu_node_values_output);
     }
+    std::swap(d_node_values_input, d_gpu_node_values_output);
 
     check_launch("gpu graph propagate");
     double gpu_elapsed_time = stop_timer(&timer);
@@ -144,8 +139,8 @@ double device_graph_iterate(
  */
 uint get_total_bytes(uint nodes, uint edges, uint iterations)
 {
-    // TODO
-    return 0;
+    uint bytes = iterations * nodes * 4 * (2 + 6*edges);
+    return bytes;
 }
 
 #endif
