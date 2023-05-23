@@ -16,33 +16,33 @@ inline float stencil(float *curr_grid, int gx, int x, int y, float xcfl,
     {
         return curr_grid[x + gx * y] +
                xcfl * (curr_grid[x + 1 + gx * y] + curr_grid[x - 1 + gx * y] -
-                       2 * curr_grid[x + gx * y]) +
+                       2.f * curr_grid[x + gx * y]) +
                ycfl * (curr_grid[x + gx * (y + 1)] + curr_grid[x + gx * (y - 1)] -
-                       2 * curr_grid[x + gx * y]);
+                       2.f * curr_grid[x + gx * y]);
     }
     else if (order == 4)
     {
         return curr_grid[x + gx * y] +
-               xcfl * (-curr_grid[x + 2 + gx * y] + 16 * curr_grid[x + 1 + gx * y] -
-                       30 * curr_grid[x + gx * y] + 16 * curr_grid[x - 1 + gx * y] -
+               xcfl * (-curr_grid[x + 2 + gx * y] + 16.f * curr_grid[x + 1 + gx * y] -
+                       30.f * curr_grid[x + gx * y] + 16.f * curr_grid[x - 1 + gx * y] -
                        curr_grid[x - 2 + gx * y]) +
-               ycfl * (-curr_grid[x + gx * (y + 2)] + 16 * curr_grid[x + gx * (y + 1)] -
-                       30 * curr_grid[x + gx * y] + 16 * curr_grid[x + gx * (y - 1)] -
+               ycfl * (-curr_grid[x + gx * (y + 2)] + 16.f * curr_grid[x + gx * (y + 1)] -
+                       30.f * curr_grid[x + gx * y] + 16.f * curr_grid[x + gx * (y - 1)] -
                        curr_grid[x + gx * (y - 2)]);
     }
     else if (order == 8)
     {
         return curr_grid[x + gx * y] +
-               xcfl * (-9 * curr_grid[x + 4 + gx * y] + 128 * curr_grid[x + 3 + gx * y] -
-                       1008 * curr_grid[x + 2 + gx * y] + 8064 * curr_grid[x + 1 + gx * y] -
-                       14350 * curr_grid[x + gx * y] + 8064 * curr_grid[x - 1 + gx * y] -
-                       1008 * curr_grid[x - 2 + gx * y] + 128 * curr_grid[x - 3 + gx * y] -
-                       9 * curr_grid[x - 4 + gx * y]) +
-               ycfl * (-9 * curr_grid[x + gx * (y + 4)] + 128 * curr_grid[x + gx * (y + 3)] -
-                       1008 * curr_grid[x + gx * (y + 2)] + 8064 * curr_grid[x + gx * (y + 1)] -
-                       14350 * curr_grid[x + gx * y] + 8064 * curr_grid[x + gx * (y - 1)] -
-                       1008 * curr_grid[x + gx * (y - 2)] + 128 * curr_grid[x + gx * (y - 3)] -
-                       9 * curr_grid[x + gx * (y - 4)]);
+               xcfl * (-9.f * curr_grid[x + 4 + gx * y] + 128.f * curr_grid[x + 3 + gx * y] -
+                       1008.f * curr_grid[x + 2 + gx * y] + 8064.f * curr_grid[x + 1 + gx * y] -
+                       14350.f * curr_grid[x + gx * y] + 8064.f * curr_grid[x - 1 + gx * y] -
+                       1008.f * curr_grid[x - 2 + gx * y] + 128.f * curr_grid[x - 3 + gx * y] -
+                       9.f * curr_grid[x - 4 + gx * y]) +
+               ycfl * (-9.f * curr_grid[x + gx * (y + 4)] + 128.f * curr_grid[x + gx * (y + 3)] -
+                       1008.f * curr_grid[x + gx * (y + 2)] + 8064.f * curr_grid[x + gx * (y + 1)] -
+                       14350.f * curr_grid[x + gx * y] + 8064.f * curr_grid[x + gx * (y - 1)] -
+                       1008.f * curr_grid[x + gx * (y - 2)] + 128.f * curr_grid[x + gx * (y - 3)] -
+                       9.f * curr_grid[x + gx * (y - 4)]);
     }
     else
     {
@@ -108,7 +108,7 @@ double cpuComputation(Grid &curr_grid, const simParams &params)
 
         Grid::swap(curr_grid, next_grid);
     }
-    return stop_timer(&timer);
+    return stop_timer(&timer); 
 }
 
 #endif

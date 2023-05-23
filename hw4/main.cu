@@ -109,13 +109,14 @@ TEST(DiffusionTest, GlobalTest)
     int error = checkErrors(grid, gpuGrid, params, "globalErrors.txt", errorsg);
     PrintErrors(errorsg);
 
+    // for debugging, save data to file
+    gpuGrid.saveStateToFile("gpu_global_final.csv");
+    
     // Tell Gtest failure occurs
     if (error)
     {
         FAIL() << "There was an error in the computation, quitting..." << endl;
     }
-    // for debugging, save data to file
-    // gpuGrid.saveStateToFile("final_gpu_global.csv");
 }
 
 TEST(DiffusionTest, BlockTest)
@@ -134,13 +135,13 @@ TEST(DiffusionTest, BlockTest)
     gpuGrid.fromGPU();
     int error = checkErrors(grid, gpuGrid, params, "globalErrors.txt", errorsb);
     PrintErrors(errorsb);
-
+    gpuGrid.saveStateToFile("gpu_block_final.csv");
     // Tell Gtest failure occurs
     if (error)
     {
         FAIL() << "There was an error in the computation, quitting..." << endl;
     }
-    // gpuGrid.saveStateToFile("final_gpu_block.csv");
+    
 }
 
 TEST(DiffusionTest, SharedTest)
@@ -176,7 +177,7 @@ TEST(DiffusionTest, SharedTest)
     {
         FAIL() << "There was an error in the computation, quitting..." << endl;
     }
-    // gpuGrid.saveStateToFile("final_gpu_shared.csv");
+    gpuGrid.saveStateToFile("final_gpu_shared.csv");
 }
 
 int main(int argc, char *argv[])
@@ -187,7 +188,7 @@ int main(int argc, char *argv[])
     initGrid(grid, params);
 
     // for debugging, you may want to uncomment this line
-    // grid.saveStateToFile("init");
+    grid.saveStateToFile("cpu_init.csv");
     // save our initial state, useful for making sure we got setup and BCs right
 
     cout << "Order: " << params.order() << ", "
@@ -199,7 +200,7 @@ int main(int argc, char *argv[])
     double elapsed = cpuComputation(grid, params);
 
     // for debugging, you may want to uncomment the following line
-    grid.saveStateToFile("final_cpu");
+    grid.saveStateToFile("cpu_final.csv");
 
     // Print statistics for CPU calculation
     cout << setw(15) << "CPU" << setw(15) << setprecision(6) << elapsed

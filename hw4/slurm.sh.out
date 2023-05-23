@@ -1,0 +1,45 @@
+Starting at Tue May 23 07:28:24 AM UTC 2023
+
+nvcc -c main.cu --fmad=false -O3 -arch=compute_75 -code=sm_75 -Xcompiler -Wall,-Winline,-Wextra,-Wno-strict-aliasing -std=c++14 -isystem ../hw3/googletest-main/googletest/include
+nvcc main.o simParams.o Grid.o gtest_main.a -lcudart --fmad=false -O3 -arch=compute_75 -code=sm_75 -Xcompiler -Wall,-Winline,-Wextra,-Wno-strict-aliasing -std=c++14 -isystem ../hw3/googletest-main/googletest/include -o main
+
+Output from main
+----------------
+Order: 8, 4096x4096, 100 iterations
+                     time (ms)     GBytes/sec
+            CPU         2789.4        43.3054
+[==========] Running 3 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 3 tests from DiffusionTest
+[ RUN      ] DiffusionTest.GlobalTest
+Order: 8, 4096x4096, 100 iterations
+                     time (ms)     GBytes/sec
+         Global        7966.47        15.1631
+
+          L2Ref           LInf          L2Err
+       0.447065              0              0
+
+[       OK ] DiffusionTest.GlobalTest (16305 ms)
+[ RUN      ] DiffusionTest.BlockTest
+Order: 8, 4096x4096, 100 iterations
+                     time (ms)     GBytes/sec
+          Block        37.7242        3202.08
+
+          L2Ref           LInf          L2Err
+       0.447065              0              0
+
+[       OK ] DiffusionTest.BlockTest (8270 ms)
+[ RUN      ] DiffusionTest.SharedTest
+Order: 8, 4096x4096, 100 iterations
+                     time (ms)     GBytes/sec
+         Shared        55.1752        2189.31
+
+          L2Ref           LInf          L2Err
+       0.447065              0              0
+
+[       OK ] DiffusionTest.SharedTest (8229 ms)
+[----------] 3 tests from DiffusionTest (32806 ms total)
+
+[----------] Global test environment tear-down
+[==========] 3 tests from 1 test suite ran. (32806 ms total)
+[  PASSED  ] 3 tests.
