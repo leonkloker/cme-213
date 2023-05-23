@@ -112,7 +112,7 @@ double gpuComputationGlobal(Grid& curr_grid, const simParams& params) {
     curr_grid.saveStateToFile("gpu_global_init.csv");
 
     for(int i = 0; i < params.iters(); ++i) {
-        
+        if (i==1000)curr_grid.saveStateToFile("gpu_global_1000.csv");
         // update the values on the boundary only
         BC.updateBC(next_grid.dGrid_, curr_grid.dGrid_);
 

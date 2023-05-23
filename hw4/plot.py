@@ -12,17 +12,13 @@ with open(sys.argv[1], 'r') as fid:
 
 x_dim = int(rows[0][0])
 y_dim = int(rows[1][0])
-data = np.array(rows[2][:-1], dtype=np.float64)
+data = np.array(rows[2][:-1], dtype=np.float)
 
 x = np.arange(x_dim)
 y = np.arange(y_dim)
 X, Y = np.meshgrid(x, y)
 Z = data.reshape(X.shape)
 
-x = np.arange(256)
-y = np.arange(256)
-X, Y = np.meshgrid(x, y)
-Z = Z[:-16:16, :-16:16]
 
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
@@ -33,5 +29,5 @@ ax.set_xlabel('X')
 ax.set_ylabel('Y')
 ax.set_zlabel('Temperature')
 ax.set_zlim(-1, 1)
-fig.show()
+
 fig.savefig("plot.png")

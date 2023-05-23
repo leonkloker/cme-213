@@ -1,585 +1,585 @@
-Order: 2, 256x256, 100 iterations
+Order: 2, 256x256, 2000 iterations
                      time (ms)     GBytes/sec
-            CPU        2.54221          61.87
+            CPU        58.0071          54.23
 [==========] Running 3 tests from 1 test suite.
 [----------] Global test environment set-up.
 [----------] 3 tests from DiffusionTest
 [ RUN      ] DiffusionTest.GlobalTest
-Order: 2, 256x256, 100 iterations
+Order: 2, 256x256, 2000 iterations
                      time (ms)     GBytes/sec
-         Global        128.556        1.22348
+         Global        269.009        11.6938
 
           L2Ref           LInf          L2Err
-        0.42496              0              0
+      0.0148558              0              0
 
-[       OK ] DiffusionTest.GlobalTest (268 ms)
+[       OK ] DiffusionTest.GlobalTest (394 ms)
 [ RUN      ] DiffusionTest.BlockTest
-Order: 2, 256x256, 100 iterations
+Order: 2, 256x256, 2000 iterations
                      time (ms)     GBytes/sec
-          Block       0.704736        223.185
+          Block        13.9612        225.319
 
           L2Ref           LInf          L2Err
-        0.42496              0              0
+      0.0148558              0              0
 
-[       OK ] DiffusionTest.BlockTest (122 ms)
+[       OK ] DiffusionTest.BlockTest (170 ms)
 [ RUN      ] DiffusionTest.SharedTest
-Order: 2, 256x256, 100 iterations
+Order: 2, 256x256, 2000 iterations
                      time (ms)     GBytes/sec
-         Shared       0.907264        173.363
+         Shared        12.1592        258.711
 
           L2Ref           LInf          L2Err
-        0.42496              0              0
+      0.0148558              0              0
 
-[       OK ] DiffusionTest.SharedTest (93 ms)
-[----------] 3 tests from DiffusionTest (484 ms total)
+[       OK ] DiffusionTest.SharedTest (112 ms)
+[----------] 3 tests from DiffusionTest (677 ms total)
 
 [----------] Global test environment tear-down
-[==========] 3 tests from 1 test suite ran. (484 ms total)
+[==========] 3 tests from 1 test suite ran. (677 ms total)
 [  PASSED  ] 3 tests.
 
-Order: 2, 512x512, 100 iterations
+Order: 2, 512x512, 2000 iterations
                      time (ms)     GBytes/sec
-            CPU        9.96096        63.1611
+            CPU        205.292        61.2929
 [==========] Running 3 tests from 1 test suite.
 [----------] Global test environment set-up.
 [----------] 3 tests from DiffusionTest
 [ RUN      ] DiffusionTest.GlobalTest
-Order: 2, 512x512, 100 iterations
+Order: 2, 512x512, 2000 iterations
                      time (ms)     GBytes/sec
-         Global        152.923        4.11412
+         Global        425.602        29.5649
 
           L2Ref           LInf          L2Err
-       0.425045              0              0
+      0.0148593              0              0
 
-[       OK ] DiffusionTest.GlobalTest (317 ms)
+[       OK ] DiffusionTest.GlobalTest (669 ms)
 [ RUN      ] DiffusionTest.BlockTest
-Order: 2, 512x512, 100 iterations
+Order: 2, 512x512, 2000 iterations
                      time (ms)     GBytes/sec
-          Block       0.705216        892.132
+          Block        13.8013        911.721
 
           L2Ref           LInf          L2Err
-       0.425045              0              0
+      0.0148593              0              0
 
-[       OK ] DiffusionTest.BlockTest (163 ms)
+[       OK ] DiffusionTest.BlockTest (221 ms)
 [ RUN      ] DiffusionTest.SharedTest
-Order: 2, 512x512, 100 iterations
+Order: 2, 512x512, 2000 iterations
                      time (ms)     GBytes/sec
-         Shared       0.932064        675.003
+         Shared        18.3128         687.11
 
           L2Ref           LInf          L2Err
-       0.425045              0              0
+      0.0148593              0              0
 
-[       OK ] DiffusionTest.SharedTest (173 ms)
-[----------] 3 tests from DiffusionTest (653 ms total)
+[       OK ] DiffusionTest.SharedTest (255 ms)
+[----------] 3 tests from DiffusionTest (1146 ms total)
 
 [----------] Global test environment tear-down
-[==========] 3 tests from 1 test suite ran. (653 ms total)
+[==========] 3 tests from 1 test suite ran. (1146 ms total)
 [  PASSED  ] 3 tests.
 
-Order: 2, 1024x1024, 100 iterations
+Order: 2, 1024x1024, 2000 iterations
                      time (ms)     GBytes/sec
-            CPU        67.2986        37.3943
+            CPU        763.363        65.9341
 [==========] Running 3 tests from 1 test suite.
 [----------] Global test environment set-up.
 [----------] 3 tests from DiffusionTest
 [ RUN      ] DiffusionTest.GlobalTest
-Order: 2, 1024x1024, 100 iterations
+Order: 2, 1024x1024, 2000 iterations
                      time (ms)     GBytes/sec
-         Global        562.536        4.47363
+         Global        1454.37        34.6073
 
           L2Ref           LInf          L2Err
-       0.420628              0              0
+      0.0147059              0              0
 
-[       OK ] DiffusionTest.GlobalTest (1156 ms)
+[       OK ] DiffusionTest.GlobalTest (2124 ms)
 [ RUN      ] DiffusionTest.BlockTest
-Order: 2, 1024x1024, 100 iterations
+Order: 2, 1024x1024, 2000 iterations
                      time (ms)     GBytes/sec
-          Block        2.56589        980.784
+          Block        50.6737        993.251
 
           L2Ref           LInf          L2Err
-       0.420628              0              0
+      0.0147059              0              0
 
-[       OK ] DiffusionTest.BlockTest (589 ms)
+[       OK ] DiffusionTest.BlockTest (678 ms)
 [ RUN      ] DiffusionTest.SharedTest
-Order: 2, 1024x1024, 100 iterations
+Order: 2, 1024x1024, 2000 iterations
                      time (ms)     GBytes/sec
-         Shared        3.24854         774.68
+         Shared        64.4249        781.245
 
           L2Ref           LInf          L2Err
-       0.420628              0              0
+      0.0147059              0              0
 
-[       OK ] DiffusionTest.SharedTest (587 ms)
-[----------] 3 tests from DiffusionTest (2333 ms total)
+[       OK ] DiffusionTest.SharedTest (688 ms)
+[----------] 3 tests from DiffusionTest (3491 ms total)
 
 [----------] Global test environment tear-down
-[==========] 3 tests from 1 test suite ran. (2333 ms total)
+[==========] 3 tests from 1 test suite ran. (3491 ms total)
 [  PASSED  ] 3 tests.
 
-Order: 2, 2048x2048, 100 iterations
+Order: 2, 2048x2048, 2000 iterations
                      time (ms)     GBytes/sec
-            CPU        237.228        42.4331
+            CPU        4235.69         47.531
 [==========] Running 3 tests from 1 test suite.
 [----------] Global test environment set-up.
 [----------] 3 tests from DiffusionTest
 [ RUN      ] DiffusionTest.GlobalTest
-Order: 2, 2048x2048, 100 iterations
+Order: 2, 2048x2048, 2000 iterations
                      time (ms)     GBytes/sec
-         Global        2093.17        4.80914
+         Global        5932.05        33.9388
 
           L2Ref           LInf          L2Err
-       0.417665              0              0
+      0.0146018              0              0
 
-[       OK ] DiffusionTest.GlobalTest (4249 ms)
+[       OK ] DiffusionTest.GlobalTest (8312 ms)
 [ RUN      ] DiffusionTest.BlockTest
-Order: 2, 2048x2048, 100 iterations
+Order: 2, 2048x2048, 2000 iterations
                      time (ms)     GBytes/sec
-          Block        9.30848        1081.41
+          Block        185.623         1084.6
 
           L2Ref           LInf          L2Err
-       0.417665              0              0
+      0.0146018              0              0
 
-[       OK ] DiffusionTest.BlockTest (2167 ms)
+[       OK ] DiffusionTest.BlockTest (2464 ms)
 [ RUN      ] DiffusionTest.SharedTest
-Order: 2, 2048x2048, 100 iterations
+Order: 2, 2048x2048, 2000 iterations
                      time (ms)     GBytes/sec
-         Shared         11.143        903.379
+         Shared        213.845         941.46
 
           L2Ref           LInf          L2Err
-       0.417665              0              0
+      0.0146018              0              0
 
-[       OK ] DiffusionTest.SharedTest (2206 ms)
-[----------] 3 tests from DiffusionTest (8622 ms total)
+[       OK ] DiffusionTest.SharedTest (3023 ms)
+[----------] 3 tests from DiffusionTest (13902 ms total)
 
 [----------] Global test environment tear-down
-[==========] 3 tests from 1 test suite ran. (8622 ms total)
+[==========] 3 tests from 1 test suite ran. (13902 ms total)
 [  PASSED  ] 3 tests.
 
-Order: 2, 4096x4096, 100 iterations
+Order: 2, 4096x4096, 2000 iterations
                      time (ms)     GBytes/sec
-            CPU        899.189        44.7796
+            CPU        18444.2        43.6618
 [==========] Running 3 tests from 1 test suite.
 [----------] Global test environment set-up.
 [----------] 3 tests from DiffusionTest
 [ RUN      ] DiffusionTest.GlobalTest
-Order: 2, 4096x4096, 100 iterations
+Order: 2, 4096x4096, 2000 iterations
                      time (ms)     GBytes/sec
-         Global        8077.49        4.98488
+         Global        17787.2        45.2745
 
           L2Ref           LInf          L2Err
-       0.418194              0              0
+      0.0146203              0              0
 
-[       OK ] DiffusionTest.GlobalTest (16498 ms)
+[       OK ] DiffusionTest.GlobalTest (28250 ms)
 [ RUN      ] DiffusionTest.BlockTest
-Order: 2, 4096x4096, 100 iterations
+Order: 2, 4096x4096, 2000 iterations
                      time (ms)     GBytes/sec
-          Block         34.943        1152.32
+          Block        702.574        1146.22
 
           L2Ref           LInf          L2Err
-       0.418194              0              0
+      0.0146203              0              0
 
-[       OK ] DiffusionTest.BlockTest (8369 ms)
+[       OK ] DiffusionTest.BlockTest (9733 ms)
 [ RUN      ] DiffusionTest.SharedTest
-Order: 2, 4096x4096, 100 iterations
+Order: 2, 4096x4096, 2000 iterations
                      time (ms)     GBytes/sec
-         Shared        43.5019        925.599
+         Shared        794.674        1013.38
 
           L2Ref           LInf          L2Err
-       0.418194              0              0
+      0.0146203              0              0
 
-[       OK ] DiffusionTest.SharedTest (8451 ms)
-[----------] 3 tests from DiffusionTest (33320 ms total)
+[       OK ] DiffusionTest.SharedTest (9975 ms)
+[----------] 3 tests from DiffusionTest (47959 ms total)
 
 [----------] Global test environment tear-down
-[==========] 3 tests from 1 test suite ran. (33320 ms total)
+[==========] 3 tests from 1 test suite ran. (47960 ms total)
 [  PASSED  ] 3 tests.
 
-Order: 4, 256x256, 100 iterations
+Order: 4, 256x256, 2000 iterations
                      time (ms)     GBytes/sec
-            CPU        4.44976        58.9119
+            CPU        87.5151        59.9083
 [==========] Running 3 tests from 1 test suite.
 [----------] Global test environment set-up.
 [----------] 3 tests from DiffusionTest
 [ RUN      ] DiffusionTest.GlobalTest
-Order: 4, 256x256, 100 iterations
+Order: 4, 256x256, 2000 iterations
                      time (ms)     GBytes/sec
-         Global        130.299        2.01186
+         Global        248.947        21.0603
 
           L2Ref           LInf          L2Err
-       0.440981              0              0
+       0.035645              0              0
 
-[       OK ] DiffusionTest.GlobalTest (281 ms)
+[       OK ] DiffusionTest.GlobalTest (356 ms)
 [ RUN      ] DiffusionTest.BlockTest
-Order: 4, 256x256, 100 iterations
+Order: 4, 256x256, 2000 iterations
                      time (ms)     GBytes/sec
-          Block       0.705824        371.401
+          Block        13.2102         396.88
 
           L2Ref           LInf          L2Err
-       0.440981              0              0
+       0.035645              0              0
 
-[       OK ] DiffusionTest.BlockTest (165 ms)
+[       OK ] DiffusionTest.BlockTest (158 ms)
 [ RUN      ] DiffusionTest.SharedTest
-Order: 4, 256x256, 100 iterations
+Order: 4, 256x256, 2000 iterations
                      time (ms)     GBytes/sec
-         Shared       0.681344        384.745
+         Shared        12.3335        425.091
 
           L2Ref           LInf          L2Err
-       0.440981              0              0
+       0.035645              0              0
 
-[       OK ] DiffusionTest.SharedTest (111 ms)
-[----------] 3 tests from DiffusionTest (558 ms total)
+[       OK ] DiffusionTest.SharedTest (155 ms)
+[----------] 3 tests from DiffusionTest (670 ms total)
 
 [----------] Global test environment tear-down
-[==========] 3 tests from 1 test suite ran. (558 ms total)
+[==========] 3 tests from 1 test suite ran. (670 ms total)
 [  PASSED  ] 3 tests.
 
-Order: 4, 512x512, 100 iterations
+Order: 4, 512x512, 2000 iterations
                      time (ms)     GBytes/sec
-            CPU        17.3668         60.378
+            CPU        344.512        60.8732
 [==========] Running 3 tests from 1 test suite.
 [----------] Global test environment set-up.
 [----------] 3 tests from DiffusionTest
 [ RUN      ] DiffusionTest.GlobalTest
-Order: 4, 512x512, 100 iterations
+Order: 4, 512x512, 2000 iterations
                      time (ms)     GBytes/sec
-         Global        149.432        7.01706
+         Global        372.358        56.3209
 
           L2Ref           LInf          L2Err
-       0.443417              0              0
+      0.0358427              0              0
 
-[       OK ] DiffusionTest.GlobalTest (319 ms)
+[       OK ] DiffusionTest.GlobalTest (600 ms)
 [ RUN      ] DiffusionTest.BlockTest
-Order: 4, 512x512, 100 iterations
+Order: 4, 512x512, 2000 iterations
                      time (ms)     GBytes/sec
-          Block       0.755712        1387.53
+          Block        15.0049        1397.64
 
           L2Ref           LInf          L2Err
-       0.443417              0              0
+      0.0358427              0              0
 
-[       OK ] DiffusionTest.BlockTest (167 ms)
+[       OK ] DiffusionTest.BlockTest (206 ms)
 [ RUN      ] DiffusionTest.SharedTest
-Order: 4, 512x512, 100 iterations
+Order: 4, 512x512, 2000 iterations
                      time (ms)     GBytes/sec
-         Shared       0.995328         1053.5
+         Shared        19.7374        1062.53
 
           L2Ref           LInf          L2Err
-       0.443417              0              0
+      0.0358427              0              0
 
-[       OK ] DiffusionTest.SharedTest (186 ms)
-[----------] 3 tests from DiffusionTest (674 ms total)
+[       OK ] DiffusionTest.SharedTest (248 ms)
+[----------] 3 tests from DiffusionTest (1055 ms total)
 
 [----------] Global test environment tear-down
-[==========] 3 tests from 1 test suite ran. (674 ms total)
+[==========] 3 tests from 1 test suite ran. (1055 ms total)
 [  PASSED  ] 3 tests.
 
-Order: 4, 1024x1024, 100 iterations
+Order: 4, 1024x1024, 2000 iterations
                      time (ms)     GBytes/sec
-            CPU        97.2589        43.1251
+            CPU         1391.7        60.2759
 [==========] Running 3 tests from 1 test suite.
 [----------] Global test environment set-up.
 [----------] 3 tests from DiffusionTest
 [ RUN      ] DiffusionTest.GlobalTest
-Order: 4, 1024x1024, 100 iterations
+Order: 4, 1024x1024, 2000 iterations
                      time (ms)     GBytes/sec
-         Global        550.584        7.61791
+         Global         1399.1        59.9573
 
           L2Ref           LInf          L2Err
-       0.440276              0              0
+      0.0355901              0              0
 
-[       OK ] DiffusionTest.GlobalTest (1124 ms)
+[       OK ] DiffusionTest.GlobalTest (1998 ms)
 [ RUN      ] DiffusionTest.BlockTest
-Order: 4, 1024x1024, 100 iterations
+Order: 4, 1024x1024, 2000 iterations
                      time (ms)     GBytes/sec
-          Block        2.59261        1617.79
+          Block        51.4702         1629.8
 
           L2Ref           LInf          L2Err
-       0.440276              0              0
+      0.0355901              0              0
 
-[       OK ] DiffusionTest.BlockTest (581 ms)
+[       OK ] DiffusionTest.BlockTest (701 ms)
 [ RUN      ] DiffusionTest.SharedTest
-Order: 4, 1024x1024, 100 iterations
+Order: 4, 1024x1024, 2000 iterations
                      time (ms)     GBytes/sec
-         Shared        3.43411        1221.36
+         Shared         68.354        1227.23
 
           L2Ref           LInf          L2Err
-       0.440276              0              0
+      0.0355901              0              0
 
-[       OK ] DiffusionTest.SharedTest (570 ms)
-[----------] 3 tests from DiffusionTest (2275 ms total)
+[       OK ] DiffusionTest.SharedTest (873 ms)
+[----------] 3 tests from DiffusionTest (3574 ms total)
 
 [----------] Global test environment tear-down
-[==========] 3 tests from 1 test suite ran. (2276 ms total)
+[==========] 3 tests from 1 test suite ran. (3574 ms total)
 [  PASSED  ] 3 tests.
 
-Order: 4, 2048x2048, 100 iterations
+Order: 4, 2048x2048, 2000 iterations
                      time (ms)     GBytes/sec
-            CPU        313.152        53.5753
+            CPU        5869.31        57.1693
 [==========] Running 3 tests from 1 test suite.
 [----------] Global test environment set-up.
 [----------] 3 tests from DiffusionTest
 [ RUN      ] DiffusionTest.GlobalTest
-Order: 4, 2048x2048, 100 iterations
+Order: 4, 2048x2048, 2000 iterations
                      time (ms)     GBytes/sec
-         Global        2083.64        8.05187
+         Global        4590.58        73.0941
 
           L2Ref           LInf          L2Err
-        0.43628              0              0
+      0.0352664              0              0
 
-[       OK ] DiffusionTest.GlobalTest (4234 ms)
+[       OK ] DiffusionTest.GlobalTest (7058 ms)
 [ RUN      ] DiffusionTest.BlockTest
-Order: 4, 2048x2048, 100 iterations
+Order: 4, 2048x2048, 2000 iterations
                      time (ms)     GBytes/sec
-          Block        9.54138        1758.36
+          Block        190.586        1760.59
 
           L2Ref           LInf          L2Err
-        0.43628              0              0
+      0.0352664              0              0
 
-[       OK ] DiffusionTest.BlockTest (2188 ms)
+[       OK ] DiffusionTest.BlockTest (2782 ms)
 [ RUN      ] DiffusionTest.SharedTest
-Order: 4, 2048x2048, 100 iterations
+Order: 4, 2048x2048, 2000 iterations
                      time (ms)     GBytes/sec
-         Shared        11.8948        1410.47
+         Shared         233.88        1434.69
 
           L2Ref           LInf          L2Err
-        0.43628              0              0
+      0.0352664              0              0
 
-[       OK ] DiffusionTest.SharedTest (2131 ms)
-[----------] 3 tests from DiffusionTest (8553 ms total)
+[       OK ] DiffusionTest.SharedTest (2699 ms)
+[----------] 3 tests from DiffusionTest (12540 ms total)
 
 [----------] Global test environment tear-down
-[==========] 3 tests from 1 test suite ran. (8553 ms total)
+[==========] 3 tests from 1 test suite ran. (12541 ms total)
 [  PASSED  ] 3 tests.
 
-Order: 4, 4096x4096, 100 iterations
+Order: 4, 4096x4096, 2000 iterations
                      time (ms)     GBytes/sec
-            CPU        1176.28        57.0518
+            CPU        23472.8        57.1801
 [==========] Running 3 tests from 1 test suite.
 [----------] Global test environment set-up.
 [----------] 3 tests from DiffusionTest
 [ RUN      ] DiffusionTest.GlobalTest
-Order: 4, 4096x4096, 100 iterations
+Order: 4, 4096x4096, 2000 iterations
                      time (ms)     GBytes/sec
-         Global        8008.33        8.37988
+         Global        19424.6        69.0967
 
           L2Ref           LInf          L2Err
-       0.437091              0              0
+       0.035332              0              0
 
-[       OK ] DiffusionTest.GlobalTest (16213 ms)
+[       OK ] DiffusionTest.GlobalTest (28342 ms)
 [ RUN      ] DiffusionTest.BlockTest
-Order: 4, 4096x4096, 100 iterations
+Order: 4, 4096x4096, 2000 iterations
                      time (ms)     GBytes/sec
-          Block         35.842        1872.35
+          Block        720.306        1863.34
 
           L2Ref           LInf          L2Err
-       0.437091              0              0
+       0.035332              0              0
 
-[       OK ] DiffusionTest.BlockTest (8242 ms)
+[       OK ] DiffusionTest.BlockTest (10521 ms)
 [ RUN      ] DiffusionTest.SharedTest
-Order: 4, 4096x4096, 100 iterations
+Order: 4, 4096x4096, 2000 iterations
                      time (ms)     GBytes/sec
-         Shared         46.599        1440.14
+         Shared        844.378        1589.55
 
           L2Ref           LInf          L2Err
-       0.437091              0              0
+       0.035332              0              0
 
-[       OK ] DiffusionTest.SharedTest (8209 ms)
-[----------] 3 tests from DiffusionTest (32664 ms total)
+[       OK ] DiffusionTest.SharedTest (13386 ms)
+[----------] 3 tests from DiffusionTest (52250 ms total)
 
 [----------] Global test environment tear-down
-[==========] 3 tests from 1 test suite ran. (32664 ms total)
+[==========] 3 tests from 1 test suite ran. (52250 ms total)
 [  PASSED  ] 3 tests.
 
-Order: 8, 256x256, 100 iterations
+Order: 8, 256x256, 2000 iterations
                      time (ms)     GBytes/sec
-            CPU        10.4242        45.2658
+            CPU        217.205        43.4483
 [==========] Running 3 tests from 1 test suite.
 [----------] Global test environment set-up.
 [----------] 3 tests from DiffusionTest
 [ RUN      ] DiffusionTest.GlobalTest
-Order: 8, 256x256, 100 iterations
+Order: 8, 256x256, 2000 iterations
                      time (ms)     GBytes/sec
-         Global        137.292        3.43689
+         Global        357.457        26.4009
 
           L2Ref           LInf          L2Err
-       0.444061              0              0
+      0.0545994              0              0
 
-[       OK ] DiffusionTest.GlobalTest (283 ms)
+[       OK ] DiffusionTest.GlobalTest (568 ms)
 [ RUN      ] DiffusionTest.BlockTest
-Order: 8, 256x256, 100 iterations
+Order: 8, 256x256, 2000 iterations
                      time (ms)     GBytes/sec
-          Block       0.790144        597.181
+          Block        15.4675         610.13
 
           L2Ref           LInf          L2Err
-       0.444061              0              0
+      0.0545994              0              0
 
-[       OK ] DiffusionTest.BlockTest (92 ms)
+[       OK ] DiffusionTest.BlockTest (247 ms)
 [ RUN      ] DiffusionTest.SharedTest
-Order: 8, 256x256, 100 iterations
+Order: 8, 256x256, 2000 iterations
                      time (ms)     GBytes/sec
-         Shared       0.632384        746.159
+         Shared        12.6218        747.688
 
           L2Ref           LInf          L2Err
-       0.444061              0              0
+      0.0545994              0              0
 
-[       OK ] DiffusionTest.SharedTest (134 ms)
-[----------] 3 tests from DiffusionTest (509 ms total)
+[       OK ] DiffusionTest.SharedTest (169 ms)
+[----------] 3 tests from DiffusionTest (985 ms total)
 
 [----------] Global test environment tear-down
-[==========] 3 tests from 1 test suite ran. (509 ms total)
+[==========] 3 tests from 1 test suite ran. (985 ms total)
 [  PASSED  ] 3 tests.
 
-Order: 8, 512x512, 100 iterations
+Order: 8, 512x512, 2000 iterations
                      time (ms)     GBytes/sec
-            CPU        41.7772        45.1787
+            CPU        827.693        45.6072
 [==========] Running 3 tests from 1 test suite.
 [----------] Global test environment set-up.
 [----------] 3 tests from DiffusionTest
 [ RUN      ] DiffusionTest.GlobalTest
-Order: 8, 512x512, 100 iterations
+Order: 8, 512x512, 2000 iterations
                      time (ms)     GBytes/sec
-         Global        153.644        12.2845
+         Global          598.2        63.1038
 
           L2Ref           LInf          L2Err
-       0.450735              0              0
+      0.0554205              0              0
 
-[       OK ] DiffusionTest.GlobalTest (324 ms)
+[       OK ] DiffusionTest.GlobalTest (910 ms)
 [ RUN      ] DiffusionTest.BlockTest
-Order: 8, 512x512, 100 iterations
+Order: 8, 512x512, 2000 iterations
                      time (ms)     GBytes/sec
-          Block       0.910144        2073.78
+          Block        17.7898        2121.94
 
           L2Ref           LInf          L2Err
-       0.450735              0              0
+      0.0554205              0              0
 
-[       OK ] DiffusionTest.BlockTest (187 ms)
+[       OK ] DiffusionTest.BlockTest (365 ms)
 [ RUN      ] DiffusionTest.SharedTest
-Order: 8, 512x512, 100 iterations
+Order: 8, 512x512, 2000 iterations
                      time (ms)     GBytes/sec
-         Shared        1.18438         1593.6
+         Shared          23.35        1616.65
 
           L2Ref           LInf          L2Err
-       0.450735              0              0
+      0.0554205              0              0
 
-[       OK ] DiffusionTest.SharedTest (160 ms)
-[----------] 3 tests from DiffusionTest (672 ms total)
+[       OK ] DiffusionTest.SharedTest (374 ms)
+[----------] 3 tests from DiffusionTest (1650 ms total)
 
 [----------] Global test environment tear-down
-[==========] 3 tests from 1 test suite ran. (672 ms total)
+[==========] 3 tests from 1 test suite ran. (1650 ms total)
 [  PASSED  ] 3 tests.
 
-Order: 8, 1024x1024, 100 iterations
+Order: 8, 1024x1024, 2000 iterations
                      time (ms)     GBytes/sec
-            CPU        200.694        37.6182
+            CPU        3467.99        43.5397
 [==========] Running 3 tests from 1 test suite.
 [----------] Global test environment set-up.
 [----------] 3 tests from DiffusionTest
 [ RUN      ] DiffusionTest.GlobalTest
-Order: 8, 1024x1024, 100 iterations
+Order: 8, 1024x1024, 2000 iterations
                      time (ms)     GBytes/sec
-         Global        564.394        13.3767
+         Global         1279.7        117.992
 
           L2Ref           LInf          L2Err
-       0.451002              0              0
+      0.0554551              0              0
 
-[       OK ] DiffusionTest.GlobalTest (1142 ms)
+[       OK ] DiffusionTest.GlobalTest (1922 ms)
 [ RUN      ] DiffusionTest.BlockTest
-Order: 8, 1024x1024, 100 iterations
+Order: 8, 1024x1024, 2000 iterations
                      time (ms)     GBytes/sec
-          Block        2.98189        2531.87
+          Block        59.0783        2555.84
 
           L2Ref           LInf          L2Err
-       0.451002              0              0
+      0.0554551              0              0
 
-[       OK ] DiffusionTest.BlockTest (593 ms)
+[       OK ] DiffusionTest.BlockTest (667 ms)
 [ RUN      ] DiffusionTest.SharedTest
-Order: 8, 1024x1024, 100 iterations
+Order: 8, 1024x1024, 2000 iterations
                      time (ms)     GBytes/sec
-         Shared         4.1513        1818.65
+         Shared        81.7227        1847.65
 
           L2Ref           LInf          L2Err
-       0.451002              0              0
+      0.0554551              0              0
 
-[       OK ] DiffusionTest.SharedTest (559 ms)
-[----------] 3 tests from DiffusionTest (2295 ms total)
+[       OK ] DiffusionTest.SharedTest (714 ms)
+[----------] 3 tests from DiffusionTest (3305 ms total)
 
 [----------] Global test environment tear-down
-[==========] 3 tests from 1 test suite ran. (2295 ms total)
+[==========] 3 tests from 1 test suite ran. (3305 ms total)
 [  PASSED  ] 3 tests.
 
-Order: 8, 2048x2048, 100 iterations
+Order: 8, 2048x2048, 2000 iterations
                      time (ms)     GBytes/sec
-            CPU        799.755        37.7603
+            CPU        13691.2        44.1145
 [==========] Running 3 tests from 1 test suite.
 [----------] Global test environment set-up.
 [----------] 3 tests from DiffusionTest
 [ RUN      ] DiffusionTest.GlobalTest
-Order: 8, 2048x2048, 100 iterations
+Order: 8, 2048x2048, 2000 iterations
                      time (ms)     GBytes/sec
-         Global        2124.87        14.2122
+         Global        8159.84        74.0186
 
           L2Ref           LInf          L2Err
-       0.445855              0              0
+      0.0548224              0              0
 
-[       OK ] DiffusionTest.GlobalTest (4292 ms)
+[       OK ] DiffusionTest.GlobalTest (11500 ms)
 [ RUN      ] DiffusionTest.BlockTest
-Order: 8, 2048x2048, 100 iterations
+Order: 8, 2048x2048, 2000 iterations
                      time (ms)     GBytes/sec
-          Block        10.0696        2999.04
+          Block         200.77        3008.32
 
           L2Ref           LInf          L2Err
-       0.445855              0              0
+      0.0548224              0              0
 
-[       OK ] DiffusionTest.BlockTest (2167 ms)
+[       OK ] DiffusionTest.BlockTest (3066 ms)
 [ RUN      ] DiffusionTest.SharedTest
-Order: 8, 2048x2048, 100 iterations
+Order: 8, 2048x2048, 2000 iterations
                      time (ms)     GBytes/sec
-         Shared        14.3275        2107.77
+         Shared        272.669        2215.07
 
           L2Ref           LInf          L2Err
-       0.445855              0              0
+      0.0548224              0              0
 
-[       OK ] DiffusionTest.SharedTest (2205 ms)
-[----------] 3 tests from DiffusionTest (8665 ms total)
+[       OK ] DiffusionTest.SharedTest (2631 ms)
+[----------] 3 tests from DiffusionTest (17199 ms total)
 
 [----------] Global test environment tear-down
-[==========] 3 tests from 1 test suite ran. (8665 ms total)
+[==========] 3 tests from 1 test suite ran. (17199 ms total)
 [  PASSED  ] 3 tests.
 
-Order: 8, 4096x4096, 100 iterations
+Order: 8, 4096x4096, 2000 iterations
                      time (ms)     GBytes/sec
-            CPU        2799.96        43.1421
+            CPU        55838.3        43.2664
 [==========] Running 3 tests from 1 test suite.
 [----------] Global test environment set-up.
 [----------] 3 tests from DiffusionTest
 [ RUN      ] DiffusionTest.GlobalTest
-Order: 8, 4096x4096, 100 iterations
+Order: 8, 4096x4096, 2000 iterations
                      time (ms)     GBytes/sec
-         Global        8098.84        14.9152
+         Global        20582.2        117.379
 
           L2Ref           LInf          L2Err
-       0.447065              0              0
+       0.054971              0              0
 
-[       OK ] DiffusionTest.GlobalTest (16500 ms)
+[       OK ] DiffusionTest.GlobalTest (29777 ms)
 [ RUN      ] DiffusionTest.BlockTest
-Order: 8, 4096x4096, 100 iterations
+Order: 8, 4096x4096, 2000 iterations
                      time (ms)     GBytes/sec
-          Block        37.7446        3200.35
+          Block        754.719        3201.09
 
           L2Ref           LInf          L2Err
-       0.447065              0              0
+       0.054971              0              0
 
-[       OK ] DiffusionTest.BlockTest (8462 ms)
+[       OK ] DiffusionTest.BlockTest (11536 ms)
 [ RUN      ] DiffusionTest.SharedTest
-Order: 8, 4096x4096, 100 iterations
+Order: 8, 4096x4096, 2000 iterations
                      time (ms)     GBytes/sec
-         Shared        55.1696        2189.54
+         Shared        957.606        2522.87
 
           L2Ref           LInf          L2Err
-       0.447065              0              0
+       0.054971              0              0
 
-[       OK ] DiffusionTest.SharedTest (8346 ms)
-[----------] 3 tests from DiffusionTest (33310 ms total)
+[       OK ] DiffusionTest.SharedTest (9953 ms)
+[----------] 3 tests from DiffusionTest (51267 ms total)
 
 [----------] Global test environment tear-down
-[==========] 3 tests from 1 test suite ran. (33310 ms total)
+[==========] 3 tests from 1 test suite ran. (51267 ms total)
 [  PASSED  ] 3 tests.
 
