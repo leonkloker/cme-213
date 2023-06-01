@@ -213,8 +213,7 @@ int main(int argc, char *argv[])
 
   arma::Mat<nn_real> x_test(IMAGE_SIZE, NUM_TEST);
   arma::Row<nn_real> label_test = arma::zeros<arma::Row<nn_real>>(NUM_TEST);
-  arma::Mat<nn_real> y_test =
-      arma::zeros<arma::Mat<nn_real>>(NUM_CLASSES, NUM_TEST);
+  arma::Mat<nn_real> y_test = arma::zeros<arma::Mat<nn_real>>(NUM_CLASSES, NUM_TEST);
 
   NeuralNetwork seq_nn(H);
   NeuralNetwork nn(H);
@@ -264,8 +263,7 @@ int main(int argc, char *argv[])
     arma::Row<nn_real> label = arma::zeros<arma::Row<nn_real>>(NUM_TRAIN);
     // y is the matrix of one-hot label vectors where only y[c] = 1,
     // where c is the right class.
-    arma::Mat<nn_real> y =
-        arma::zeros<arma::Mat<nn_real>>(NUM_CLASSES, NUM_TRAIN);
+    arma::Mat<nn_real> y = arma::zeros<arma::Mat<nn_real>>(NUM_CLASSES, NUM_TRAIN);
 
     std::cout << "Loading training data" << std::endl;
     read_mnist(file_train_images, x);

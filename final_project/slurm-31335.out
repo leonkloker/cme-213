@@ -1,0 +1,17 @@
+==PROF== Connected to process 98771 (/home/leonkl/cme-213/final_project/main)
+Number of MPI processes         1
+Number of CUDA devices          4
+
+Entering GEMM Benchmarking mode! Stand by.
+
+Starting GEMM 1: M = 8000; N = 10000; K = 7840
+==PROF== Profiling "volta_sgemm_128x128_nn" - 0: 0%....50%....100% - 32 passes
+==PROF== Profiling "volta_sgemm_128x128_nn" - 1: 0%....50%....100% - 32 passes
+==PROF== Profiling "volta_sgemm_128x128_nn" - 2: 0%....50%....100% - 32 passes
+==PROF== Profiling "volta_sgemm_128x128_nn" - 3: 0%....50%....100% - 32 passes
+==PROF== Profiling "volta_sgemm_128x128_nn" - 4: 0%....50%....100% - 32 passes
+error in myGEMM dummy kernel
+error was: invalid argument
+==PROF== Disconnected from process 98771
+==ERROR== The application returned an error code (1).
+==PROF== Report: /home/leonkl/cme-213/final_project/ncompute.ncu-rep
