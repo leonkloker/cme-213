@@ -266,7 +266,7 @@ void repmatKernel(double* mat1, double* mat2, int M, int N) {
     uint i = (blockIdx.y * blockDim.y) + threadIdx.y; // let this correspond to row index
     uint j = (blockIdx.x * blockDim.x) + threadIdx.x; // let this correspond to column index 
 
-    if (i < M && j < N){ 
+    if (i < M && j < N){
         mat2[j*M + i] = mat1[i]; 
     }
 }

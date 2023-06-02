@@ -179,6 +179,8 @@ int main(int argc, char *argv[])
     return 0;
   }
 
+  std::cout << "TEST  " << std::endl << std::flush;
+
   // DNN learning tests
   if (grade == 1)
   {

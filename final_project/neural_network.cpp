@@ -252,6 +252,103 @@ void train(NeuralNetwork &nn, const arma::Mat<nn_real> &X,
 }
 
 /*
+Routine to do the forward pass through the neural network nn
+*/
+void feedforward_gpu(NeuralNetwork &nn, const arma::Mat<nn_real> &X,
+                 struct cache &cache){
+    
+    // Set size of cache
+    cache.z.resize(2);
+    cache.a.resize(2);
+
+    // Check that the input matrix has the correct number of rows
+    assert(X.n_rows == nn.W[0].n_cols);
+    cache.X = X;
+
+    // Forward propagate through first dense layer
+    arma::Mat<nn_real> Z1(nn.W[0].n_rows, X.n_cols), A1(nn.W[0].n_rows, X.n_cols),
+                       Z2(nn.W[1].n_rows, X.n_cols), A2(nn.W[1].n_rows, X.n_cols);
+    repmat_gpu(nn.b[0].memptr(), Z1.memptr(), nn.b[0].n_rows, nn.b[0].n_cols, 1, X.n_cols);
+    myGEMM(nn.W[0].memptr(), X.memptr(), Z1.memptr(), 1.0, 1.0, nn.W[0].n_rows, X.n_cols, nn.W[0].n_cols);
+    cache.z[0] = Z1;
+
+    // Apply sigmoid
+    sigmoid_gpu(Z1.memptr(), A1.memptr(), Z1.n_rows, Z1.n_cols);
+    cache.a[0] = A1;
+
+    // Forward propagate through second dense layer
+    repmat_gpu(nn.b[1].memptr(), Z2.memptr(), nn.b[1].n_rows, nn.b[1].n_cols, 1, X.n_cols);
+    myGEMM(nn.W[1].memptr(), A1.memptr(), Z2.memptr(), 1.0, 1.0, nn.W[1].n_rows, A1.n_cols, nn.W[1].n_cols);
+    cache.z[1] = Z2;
+
+    // Apply softmax
+    softmax_gpu(Z2.memptr(), A2.memptr(), Z2.n_rows, Z2.n_cols);
+    cache.a[1] = A2;
+    cache.yc = A2;
+}
+
+/*
+Routine to do a prediction using a neural network nn
+*/
+void predict_gpu(NeuralNetwork &nn, const arma::Mat<nn_real> &X,
+             arma::Row<nn_real> &label)
+{
+    struct cache fcache;
+    feedforward_gpu(nn, X, fcache);
+    label.set_size(X.n_cols);
+
+    // Find the label with the highest probability
+    for (int i = 0; i < X.n_cols; ++i)
+    {
+        arma::uword row;
+        fcache.yc.col(i).max(row);
+        label(i) = row;
+    }
+}
+
+/*
+Routine to do the backward pass through the neural network nn
+*/
+void backprop_gpu(NeuralNetwork &nn, const arma::Mat<nn_real> &y, nn_real reg,
+              const struct cache &bpcache, struct grads &bpgrads)
+{
+    // Set size of gradients
+    bpgrads.dW.resize(2);
+    bpgrads.db.resize(2);
+    int N = y.n_cols;
+
+    // std::cout << "backprop " << bpcache.yc << "\n";
+
+    // Initialize placeholders for intermediate values
+    arma::Mat<nn_real> Diff(y.n_rows, y.n_cols), A0T(bpcache.a[0].n_cols, bpcache.a[0].n_rows), 
+                      dA1(nn.W[1].n_cols, y.n_cols), W1T(nn.W[1].n_rows, nn.W[1].n_cols),
+                      dZ1(bpcache.a[0].n_rows, bpcache.a[0].n_cols), XT(bpcache.X.n_cols, bpcache.X.n_rows);
+
+    // Calculate gradients in last layer
+    addmat_gpu(bpcache.yc.memptr(), y.memptr(), Diff.memptr(), 1.f / N, -1.f / N, bpcache.yc.n_rows, bpcache.yc.n_cols);
+
+    transpose_gpu(bpcache.a[0].memptr(), A0T.memptr(), bpcache.a[0].n_rows, bpcache.a[0].n_cols);
+    bpgrads.dW[1] = nn.W[1];
+    myGEMM(Diff.memptr(), A0T.memptr(), bpgrads.dW[1].memptr(), 1.0, reg, Diff.n_rows, A0T.n_cols, Diff.n_cols);
+
+    bpgrads.db[1] = arma::sum(Diff, 1);
+
+    // Calculate gradients in first layer
+    transpose_gpu(nn.W[1].memptr(), W1T.memptr(), nn.W[1].n_rows, nn.W[1].n_cols);
+    myGEMM(W1T.memptr(), Diff.memptr(), dA1.memptr(), 1.0, 0.0, W1T.n_rows, Diff.n_cols, W1T.n_cols);
+
+    dZ1 = 1 - bpcache.a[0];
+    elemmultmat_gpu(bpcache.a[0].memptr(), dZ1.memptr(), 1.0, dZ1.n_rows, dZ1.n_cols);
+    elemmultmat_gpu(dA1.memptr(), dZ1.memptr(), 1.0, dZ1.n_rows, dZ1.n_cols);
+
+    transpose_gpu(bpcache.X.memptr(), XT.memptr(), bpcache.X.n_rows, bpcache.X.n_cols);
+    bpgrads.dW[0] = nn.W[0];
+    myGEMM(dZ1.memptr(), XT.memptr(), bpgrads.dW[0].memptr(), 1.0, reg, dZ1.n_rows, XT.n_cols, dZ1.n_cols);
+
+    bpgrads.db[0] = arma::sum(dZ1, 1);
+}
+
+/*
  * Train the neural network &nn of rank 0 in parallel. Your MPI implementation
  * should mainly be in this function.
  */
