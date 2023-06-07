@@ -1,0 +1,80 @@
+Starting at Wed Jun  7 10:33:29 AM UTC 2023
+Current working directory is /home/leonkl/cme-213/final_project
+The master node of this job is: icmet01
+Number of compute nodes: 1
+Compute node names: icmet01
+Using 4 tasks per node.
+Number of CPUs on node: 4.
+----------------
+
+* Mode 1 *
+mpirun -np 3 ./main -g 1
+Number of MPI processes         3
+Number of CUDA devices          4
+Grading mode on; grading mode   1
+Number of neurons            1000
+Number of epochs               40
+Batch size                    800
+Regularization      9.9999997e-05
+Learning rate       0.00050000002
+The sequential code is not run
+The debug option is on
+The output directory is ./Outputs
+The CPU results are loaded from ./cpu_results
+Loading training data
+Training data information:
+Size of x_train, N =  60000
+Size of label_train = 60000
+Loading testing data
+
+Start Parallel Training
+The error in the GPU calculation during training is saved to ./Outputs/CpuGpuDiff-3-1.txt
+Loss at iteration 0 of epoch 0/40 = 2.33523
+Loading CPU data W0 from file ./cpu_results/seq_epoch-W0-0-1.mat
+Loading CPU data W1 from file ./cpu_results/seq_epoch-W1-0-1.mat
+Loading CPU data b0 from file ./cpu_results/seq_epoch-b0-0-1.mat
+Loading CPU data b1 from file ./cpu_results/seq_epoch-b1-0-1.mat
+Loss at iteration 600 of epoch 8/40 = 1.84753
+Loading CPU data W0 from file ./cpu_results/seq_epoch-W0-600-1.mat
+Loading CPU data W1 from file ./cpu_results/seq_epoch-W1-600-1.mat
+Loading CPU data b0 from file ./cpu_results/seq_epoch-b0-600-1.mat
+Loading CPU data b1 from file ./cpu_results/seq_epoch-b1-600-1.mat
+Loss at iteration 1200 of epoch 17/40 = 1.5036
+Loading CPU data W0 from file ./cpu_results/seq_epoch-W0-1200-1.mat
+Loading CPU data W1 from file ./cpu_results/seq_epoch-W1-1200-1.mat
+Loading CPU data b0 from file ./cpu_results/seq_epoch-b0-1200-1.mat
+Loading CPU data b1 from file ./cpu_results/seq_epoch-b1-1200-1.mat
+Loss at iteration 1800 of epoch 26/40 = 1.20787
+Loading CPU data W0 from file ./cpu_results/seq_epoch-W0-1800-1.mat
+Loading CPU data W1 from file ./cpu_results/seq_epoch-W1-1800-1.mat
+Loading CPU data b0 from file ./cpu_results/seq_epoch-b0-1800-1.mat
+Loading CPU data b1 from file ./cpu_results/seq_epoch-b1-1800-1.mat
+Loss at iteration 2400 of epoch 35/40 = 1.11484
+Loading CPU data W0 from file ./cpu_results/seq_epoch-W0-2400-1.mat
+Loading CPU data W1 from file ./cpu_results/seq_epoch-W1-2400-1.mat
+Loading CPU data b0 from file ./cpu_results/seq_epoch-b0-2400-1.mat
+Loading CPU data b1 from file ./cpu_results/seq_epoch-b1-2400-1.mat
+corrupted size vs. prev_size
+[icmet01:1140729] *** Process received signal ***
+[icmet01:1140729] Signal: Aborted (6)
+[icmet01:1140729] Signal code:  (-6)
+Time for Parallel Training: 24.869 seconds
+Precision on validation set for parallel training =   0.8631666898727417
+Precision on testing set for parallel training =   0.8424999713897705
+
+Checking for correctness...
+Loading from file ./cpu_results/seq_nn-W0-1.mat
+Loading from file ./cpu_results/seq_nn-b0-1.mat
+Loading from file ./cpu_results/seq_nn-W1-1.mat
+Loading from file ./cpu_results/seq_nn-b1-1.mat
+
+The error in the GPU DNN at the completion of training is saved to ./Outputs/NNErrors-3-1.txt
+Correctness test failed
+Correctness test failed
+Max norm of diff b/w seq and par: W[0]: 0.0534358, b[0]: 0.548683
+l2  norm of diff b/w seq and par: W[0]: 0.252168, b[0]: 0.539308
+Correctness test failed
+Correctness test failed
+Max norm of diff b/w seq and par: W[1]: 0.295056, b[1]: 0.812147
+l2  norm of diff b/w seq and par: W[1]: 0.338097, b[1]: 0.647033
+slurmstepd-icmet01: error: *** JOB 45755 ON icmet01 CANCELLED AT 2023-06-07T10:34:34 ***

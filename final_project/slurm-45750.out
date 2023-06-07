@@ -1,0 +1,210 @@
+Starting at Wed Jun  7 10:24:14 AM UTC 2023
+Current working directory is /home/leonkl/cme-213/final_project
+The master node of this job is: icmet01
+Number of compute nodes: 1
+Compute node names: icmet01
+Using 4 tasks per node.
+Number of CPUs on node: 4.
+----------------
+
+* Mode 1 *
+mpirun -np 2 ./main -g 1
+Number of MPI processes         2
+Number of CUDA devices          4
+Grading mode on; grading mode   1
+Number of neurons            1000
+Number of epochs               40
+Batch size                    800
+Regularization      9.9999997e-05
+Learning rate       0.00050000002
+The sequential code is not run
+The debug option is on
+The output directory is ./Outputs
+The CPU results are loaded from ./cpu_results
+Loading training data
+Training data information:
+Size of x_train, N =  60000
+Size of label_train = 60000
+Loading testing data
+
+Start Parallel Training
+The error in the GPU calculation during training is saved to ./Outputs/CpuGpuDiff-2-1.txt
+TEST1-----
+TEST2-----
+TEST1-----
+TEST2-----
+TEST1-----
+TEST2-----
+terminate called after throwing an instance of 'std::out_of_range'
+  what():  Mat::elem(): index out of bounds
+[icmet01:1140007] *** Process received signal ***
+[icmet01:1140007] Signal: Aborted (6)
+[icmet01:1140007] Signal code:  (-6)
+[icmet01:1140007] [ 0] /lib/x86_64-linux-gnu/libc.so.6(+0x42520)[0x7f22a0bf0520]
+[icmet01:1140007] [ 1] /lib/x86_64-linux-gnu/libc.so.6(pthread_kill+0x12c)[0x7f22a0c44a7c]
+[icmet01:1140007] [ 2] /lib/x86_64-linux-gnu/libc.so.6(raise+0x16)[0x7f22a0bf0476]
+[icmet01:1140007] [ 3] /lib/x86_64-linux-gnu/libc.so.6(abort+0xd3)[0x7f22a0bd67f3]
+[icmet01:1140007] [ 4] /lib/x86_64-linux-gnu/libstdc++.so.6(+0xa2bbe)[0x7f22a0e78bbe]
+[icmet01:1140007] [ 5] /lib/x86_64-linux-gnu/libstdc++.so.6(+0xae24c)[0x7f22a0e8424c]
+[icmet01:1140007] [ 6] /lib/x86_64-linux-gnu/libstdc++.so.6(+0xae2b7)[0x7f22a0e842b7]
+[icmet01:1140007] [ 7] /lib/x86_64-linux-gnu/libstdc++.so.6(+0xae518)[0x7f22a0e84518]
+[icmet01:1140007] [ 8] ./main(+0x5120b)[0x55a365ac920b]
+[icmet01:1140007] [ 9] ./main(+0x51661)[0x55a365ac9661]
+[icmet01:1140007] [10] ./main(+0x6236f)[0x55a365ada36f]
+[icmet01:1140007] [11] ./main(+0x574c1)[0x55a365acf4c1]
+[icmet01:1140007] [12] /lib/x86_64-linux-gnu/libc.so.6(+0x29d90)[0x7f22a0bd7d90]
+[icmet01:1140007] [13] /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x80)[0x7f22a0bd7e40]
+[icmet01:1140007] [14] ./main(+0x5c4e5)[0x55a365ad44e5]
+[icmet01:1140007] *** End of error message ***
+--------------------------------------------------------------------------
+Primary job  terminated normally, but 1 process returned
+a non-zero exit code. Per user-direction, the job has been aborted.
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+mpirun noticed that process rank 0 with PID 1140007 on node icmet01 exited on signal 6 (Aborted).
+--------------------------------------------------------------------------
+
+* Mode 2 *
+mpirun -np 2 ./main -g 2
+Number of MPI processes         2
+Number of CUDA devices          4
+Grading mode on; grading mode   2
+Number of neurons            1000
+Number of epochs               10
+Batch size                    800
+Regularization      9.9999997e-05
+Learning rate               0.001
+The sequential code is not run
+The debug option is on
+The output directory is ./Outputs
+The CPU results are loaded from ./cpu_results
+Loading training data
+Training data information:
+Size of x_train, N =  60000
+Size of label_train = 60000
+Loading testing data
+
+Start Parallel Training
+The error in the GPU calculation during training is saved to ./Outputs/CpuGpuDiff-2-2.txt
+TEST1-----
+TEST2-----
+TEST1-----
+TEST2-----
+TEST1-----
+TEST2-----
+terminate called after throwing an instance of 'std::out_of_range'
+  what():  Mat::elem(): index out of bounds
+[icmet01:1140034] *** Process received signal ***
+[icmet01:1140034] Signal: Aborted (6)
+[icmet01:1140034] Signal code:  (-6)
+[icmet01:1140034] [ 0] /lib/x86_64-linux-gnu/libc.so.6(+0x42520)[0x7fa5543f0520]
+[icmet01:1140034] [ 1] /lib/x86_64-linux-gnu/libc.so.6(pthread_kill+0x12c)[0x7fa554444a7c]
+[icmet01:1140034] [ 2] /lib/x86_64-linux-gnu/libc.so.6(raise+0x16)[0x7fa5543f0476]
+[icmet01:1140034] [ 3] /lib/x86_64-linux-gnu/libc.so.6(abort+0xd3)[0x7fa5543d67f3]
+[icmet01:1140034] [ 4] /lib/x86_64-linux-gnu/libstdc++.so.6(+0xa2bbe)[0x7fa554678bbe]
+[icmet01:1140034] [ 5] /lib/x86_64-linux-gnu/libstdc++.so.6(+0xae24c)[0x7fa55468424c]
+[icmet01:1140034] [ 6] /lib/x86_64-linux-gnu/libstdc++.so.6(+0xae2b7)[0x7fa5546842b7]
+[icmet01:1140034] [ 7] /lib/x86_64-linux-gnu/libstdc++.so.6(+0xae518)[0x7fa554684518]
+[icmet01:1140034] [ 8] ./main(+0x5120b)[0x561c22c4920b]
+[icmet01:1140034] [ 9] ./main(+0x51661)[0x561c22c49661]
+[icmet01:1140034] [10] ./main(+0x6236f)[0x561c22c5a36f]
+[icmet01:1140034] [11] ./main(+0x574c1)[0x561c22c4f4c1]
+[icmet01:1140034] [12] /lib/x86_64-linux-gnu/libc.so.6(+0x29d90)[0x7fa5543d7d90]
+[icmet01:1140034] [13] /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x80)[0x7fa5543d7e40]
+[icmet01:1140034] [14] ./main(+0x5c4e5)[0x561c22c544e5]
+[icmet01:1140034] *** End of error message ***
+--------------------------------------------------------------------------
+Primary job  terminated normally, but 1 process returned
+a non-zero exit code. Per user-direction, the job has been aborted.
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+mpirun noticed that process rank 0 with PID 1140034 on node icmet01 exited on signal 6 (Aborted).
+--------------------------------------------------------------------------
+
+* Mode 3 *
+mpirun -np 2 ./main -g 3
+Number of MPI processes         2
+Number of CUDA devices          4
+Grading mode on; grading mode   3
+Number of neurons            1000
+Number of epochs                1
+Batch size                    800
+Regularization      9.9999997e-05
+Learning rate        0.0020000001
+The sequential code is not run
+The debug option is on
+The output directory is ./Outputs
+The CPU results are loaded from ./cpu_results
+Loading training data
+Training data information:
+Size of x_train, N =  60000
+Size of label_train = 60000
+Loading testing data
+
+Start Parallel Training
+The error in the GPU calculation during training is saved to ./Outputs/CpuGpuDiff-2-3.txt
+TEST1-----
+TEST2-----
+TEST1-----
+TEST2-----
+TEST1-----
+TEST2-----
+terminate called after throwing an instance of 'std::out_of_range'
+  what():  Mat::elem(): index out of bounds
+[icmet01:1140053] *** Process received signal ***
+[icmet01:1140053] Signal: Aborted (6)
+[icmet01:1140053] Signal code:  (-6)
+[icmet01:1140053] [ 0] /lib/x86_64-linux-gnu/libc.so.6(+0x42520)[0x7f5de3ff0520]
+[icmet01:1140053] [ 1] /lib/x86_64-linux-gnu/libc.so.6(pthread_kill+0x12c)[0x7f5de4044a7c]
+[icmet01:1140053] [ 2] /lib/x86_64-linux-gnu/libc.so.6(raise+0x16)[0x7f5de3ff0476]
+[icmet01:1140053] [ 3] /lib/x86_64-linux-gnu/libc.so.6(abort+0xd3)[0x7f5de3fd67f3]
+[icmet01:1140053] [ 4] /lib/x86_64-linux-gnu/libstdc++.so.6(+0xa2bbe)[0x7f5de4278bbe]
+[icmet01:1140053] [ 5] /lib/x86_64-linux-gnu/libstdc++.so.6(+0xae24c)[0x7f5de428424c]
+[icmet01:1140053] [ 6] /lib/x86_64-linux-gnu/libstdc++.so.6(+0xae2b7)[0x7f5de42842b7]
+[icmet01:1140053] [ 7] /lib/x86_64-linux-gnu/libstdc++.so.6(+0xae518)[0x7f5de4284518]
+[icmet01:1140053] [ 8] ./main(+0x5120b)[0x55770e81120b]
+[icmet01:1140053] [ 9] ./main(+0x51661)[0x55770e811661]
+[icmet01:1140053] [10] ./main(+0x6236f)[0x55770e82236f]
+[icmet01:1140053] [11] ./main(+0x574c1)[0x55770e8174c1]
+[icmet01:1140053] [12] /lib/x86_64-linux-gnu/libc.so.6(+0x29d90)[0x7f5de3fd7d90]
+[icmet01:1140053] [13] /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x80)[0x7f5de3fd7e40]
+[icmet01:1140053] [14] ./main(+0x5c4e5)[0x55770e81c4e5]
+[icmet01:1140053] *** End of error message ***
+--------------------------------------------------------------------------
+Primary job  terminated normally, but 1 process returned
+a non-zero exit code. Per user-direction, the job has been aborted.
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+mpirun noticed that process rank 0 with PID 1140053 on node icmet01 exited on signal 6 (Aborted).
+--------------------------------------------------------------------------
+
+*** Summary ***
+
+
+*** Grading mode 4 ***
+
+main -g 4
+Number of MPI processes         4
+Number of CUDA devices          4
+
+Entering GEMM Benchmarking mode! Stand by.
+
+Starting GEMM 1: M = 8003; N = 10000; K = 7840
+GEMM matched with reference successfully! Rel diff = 4.99265e-08
+Time for reference GEMM implementation: 0.49021 seconds
+Time for my GEMM implementation: 4.96329 seconds
+Completed GEMM 1
+
+Starting GEMM 2: M = 8000; N = 1000; K = 10000
+GEMM matched with reference successfully! Rel diff = 5.08913e-08
+Time for reference GEMM implementation: 0.0632127 seconds
+Time for my GEMM implementation: 0.698477 seconds
+Completed GEMM 2
+
+Starting GEMM 3: M = 8000; N = 100; K = 10000
+GEMM matched with reference successfully! Rel diff = 1.07542e-06
+Time for reference GEMM implementation: 0.00815614 seconds
+Time for my GEMM implementation: 0.0858588 seconds
+Completed GEMM 3
+
+*** Tests are complete ***

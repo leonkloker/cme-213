@@ -19,7 +19,7 @@ echo ----------------
 cd $SLURM_SUBMIT_DIR
 
 # Select the number of MPI processes to use
-N=1
+N=4
 
 # This script will run all 4 modes with your choice of N
 

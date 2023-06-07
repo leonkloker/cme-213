@@ -1,0 +1,236 @@
+Starting at Wed Jun  7 11:37:50 PM UTC 2023
+Current working directory is /home/leonkl/cme-213/final_project
+The master node of this job is: icmet02
+Number of compute nodes: 1
+Compute node names: icmet02
+Using 4 tasks per node.
+Number of CPUs on node: 4.
+----------------
+
+* Mode 1 *
+mpirun -np 3 ./main -g 1
+Number of MPI processes         3
+Number of CUDA devices          3
+Grading mode on; grading mode   1
+Number of neurons            1000
+Number of epochs               40
+Batch size                    800
+Regularization      9.9999997e-05
+Learning rate       0.00050000002
+The sequential code is not run
+The debug option is on
+The output directory is ./Outputs
+The CPU results are loaded from ./cpu_results
+Loading training data
+Training data information:
+Size of x_train, N =  60000
+Size of label_train = 60000
+Loading testing data
+
+Start Parallel Training
+The error in the GPU calculation during training is saved to ./Outputs/CpuGpuDiff-3-1.txt
+Loss at iteration 0 of epoch 0/40 = 2.33523
+Loading CPU data W0 from file ./cpu_results/seq_epoch-W0-0-1.mat
+Loading CPU data W1 from file ./cpu_results/seq_epoch-W1-0-1.mat
+Loading CPU data b0 from file ./cpu_results/seq_epoch-b0-0-1.mat
+Loading CPU data b1 from file ./cpu_results/seq_epoch-b1-0-1.mat
+Loss at iteration 600 of epoch 8/40 = 1.4425
+Loading CPU data W0 from file ./cpu_results/seq_epoch-W0-600-1.mat
+Loading CPU data W1 from file ./cpu_results/seq_epoch-W1-600-1.mat
+Loading CPU data b0 from file ./cpu_results/seq_epoch-b0-600-1.mat
+Loading CPU data b1 from file ./cpu_results/seq_epoch-b1-600-1.mat
+Loss at iteration 1200 of epoch 17/40 = 0.975969
+Loading CPU data W0 from file ./cpu_results/seq_epoch-W0-1200-1.mat
+Loading CPU data W1 from file ./cpu_results/seq_epoch-W1-1200-1.mat
+Loading CPU data b0 from file ./cpu_results/seq_epoch-b0-1200-1.mat
+Loading CPU data b1 from file ./cpu_results/seq_epoch-b1-1200-1.mat
+Loss at iteration 1800 of epoch 26/40 = 0.740859
+Loading CPU data W0 from file ./cpu_results/seq_epoch-W0-1800-1.mat
+Loading CPU data W1 from file ./cpu_results/seq_epoch-W1-1800-1.mat
+Loading CPU data b0 from file ./cpu_results/seq_epoch-b0-1800-1.mat
+Loading CPU data b1 from file ./cpu_results/seq_epoch-b1-1800-1.mat
+Loss at iteration 2400 of epoch 35/40 = 0.716778
+Loading CPU data W0 from file ./cpu_results/seq_epoch-W0-2400-1.mat
+Loading CPU data W1 from file ./cpu_results/seq_epoch-W1-2400-1.mat
+Loading CPU data b0 from file ./cpu_results/seq_epoch-b0-2400-1.mat
+Loading CPU data b1 from file ./cpu_results/seq_epoch-b1-2400-1.mat
+Time for Parallel Training: 137.319 seconds
+Precision on validation set for parallel training =   0.8970000147819519
+Precision on testing set for parallel training =   0.8748000264167786
+
+Checking for correctness...
+Loading from file ./cpu_results/seq_nn-W0-1.mat
+Loading from file ./cpu_results/seq_nn-b0-1.mat
+Loading from file ./cpu_results/seq_nn-W1-1.mat
+Loading from file ./cpu_results/seq_nn-b1-1.mat
+
+The error in the GPU DNN at the completion of training is saved to ./Outputs/NNErrors-3-1.txt
+Correctness test failed
+Correctness test failed
+Max norm of diff b/w seq and par: W[0]: 0.0537405, b[0]: 41.9649
+l2  norm of diff b/w seq and par: W[0]: 0.1263, b[0]: 54.1877
+Correctness test failed
+Correctness test failed
+Max norm of diff b/w seq and par: W[1]: 0.884617, b[1]: 14.8182
+l2  norm of diff b/w seq and par: W[1]: 1.81082, b[1]: 28.2988
+
+* Mode 2 *
+mpirun -np 3 ./main -g 2
+Number of MPI processes         3
+Number of CUDA devices          3
+Grading mode on; grading mode   2
+Number of neurons            1000
+Number of epochs               10
+Batch size                    800
+Regularization      9.9999997e-05
+Learning rate               0.001
+The sequential code is not run
+The debug option is on
+The output directory is ./Outputs
+The CPU results are loaded from ./cpu_results
+Loading training data
+Training data information:
+Size of x_train, N =  60000
+Size of label_train = 60000
+Loading testing data
+
+Start Parallel Training
+The error in the GPU calculation during training is saved to ./Outputs/CpuGpuDiff-3-2.txt
+Loss at iteration 0 of epoch 0/10 = 2.33523
+Loading CPU data W0 from file ./cpu_results/seq_epoch-W0-0-2.mat
+Loading CPU data W1 from file ./cpu_results/seq_epoch-W1-0-2.mat
+Loading CPU data b0 from file ./cpu_results/seq_epoch-b0-0-2.mat
+Loading CPU data b1 from file ./cpu_results/seq_epoch-b1-0-2.mat
+Loss at iteration 150 of epoch 2/10 = 1.73323
+Loading CPU data W0 from file ./cpu_results/seq_epoch-W0-150-2.mat
+Loading CPU data W1 from file ./cpu_results/seq_epoch-W1-150-2.mat
+Loading CPU data b0 from file ./cpu_results/seq_epoch-b0-150-2.mat
+Loading CPU data b1 from file ./cpu_results/seq_epoch-b1-150-2.mat
+Loss at iteration 300 of epoch 4/10 = 1.53731
+Loading CPU data W0 from file ./cpu_results/seq_epoch-W0-300-2.mat
+Loading CPU data W1 from file ./cpu_results/seq_epoch-W1-300-2.mat
+Loading CPU data b0 from file ./cpu_results/seq_epoch-b0-300-2.mat
+Loading CPU data b1 from file ./cpu_results/seq_epoch-b1-300-2.mat
+Loss at iteration 450 of epoch 6/10 = 1.08303
+Loading CPU data W0 from file ./cpu_results/seq_epoch-W0-450-2.mat
+Loading CPU data W1 from file ./cpu_results/seq_epoch-W1-450-2.mat
+Loading CPU data b0 from file ./cpu_results/seq_epoch-b0-450-2.mat
+Loading CPU data b1 from file ./cpu_results/seq_epoch-b1-450-2.mat
+Loss at iteration 600 of epoch 8/10 = 1.04711
+Loading CPU data W0 from file ./cpu_results/seq_epoch-W0-600-2.mat
+Loading CPU data W1 from file ./cpu_results/seq_epoch-W1-600-2.mat
+Loading CPU data b0 from file ./cpu_results/seq_epoch-b0-600-2.mat
+Loading CPU data b1 from file ./cpu_results/seq_epoch-b1-600-2.mat
+Time for Parallel Training: 28.483 seconds
+Precision on validation set for parallel training =   0.8651666641235352
+Precision on testing set for parallel training =   0.8411999940872192
+
+Checking for correctness...
+Loading from file ./cpu_results/seq_nn-W0-2.mat
+Loading from file ./cpu_results/seq_nn-b0-2.mat
+Loading from file ./cpu_results/seq_nn-W1-2.mat
+Loading from file ./cpu_results/seq_nn-b1-2.mat
+
+The error in the GPU DNN at the completion of training is saved to ./Outputs/NNErrors-3-2.txt
+Correctness test failed
+Correctness test failed
+Max norm of diff b/w seq and par: W[0]: 0.0320938, b[0]: 25.3936
+l2  norm of diff b/w seq and par: W[0]: 0.110699, b[0]: 26.2187
+Correctness test failed
+Correctness test failed
+Max norm of diff b/w seq and par: W[1]: 0.54628, b[1]: 15.8694
+l2  norm of diff b/w seq and par: W[1]: 1.20024, b[1]: 23.175
+
+* Mode 3 *
+mpirun -np 3 ./main -g 3
+Number of MPI processes         3
+Number of CUDA devices          3
+Grading mode on; grading mode   3
+Number of neurons            1000
+Number of epochs                1
+Batch size                    800
+Regularization      9.9999997e-05
+Learning rate        0.0020000001
+The sequential code is not run
+The debug option is on
+The output directory is ./Outputs
+The CPU results are loaded from ./cpu_results
+Loading training data
+Training data information:
+Size of x_train, N =  60000
+Size of label_train = 60000
+Loading testing data
+
+Start Parallel Training
+The error in the GPU calculation during training is saved to ./Outputs/CpuGpuDiff-3-3.txt
+Loss at iteration 0 of epoch 0/1 = 2.33523
+Loading CPU data W0 from file ./cpu_results/seq_epoch-W0-0-3.mat
+Loading CPU data W1 from file ./cpu_results/seq_epoch-W1-0-3.mat
+Loading CPU data b0 from file ./cpu_results/seq_epoch-b0-0-3.mat
+Loading CPU data b1 from file ./cpu_results/seq_epoch-b1-0-3.mat
+Loss at iteration 15 of epoch 0/1 = 2.19589
+Loading CPU data W0 from file ./cpu_results/seq_epoch-W0-15-3.mat
+Loading CPU data W1 from file ./cpu_results/seq_epoch-W1-15-3.mat
+Loading CPU data b0 from file ./cpu_results/seq_epoch-b0-15-3.mat
+Loading CPU data b1 from file ./cpu_results/seq_epoch-b1-15-3.mat
+Loss at iteration 30 of epoch 0/1 = 2.09633
+Loading CPU data W0 from file ./cpu_results/seq_epoch-W0-30-3.mat
+Loading CPU data W1 from file ./cpu_results/seq_epoch-W1-30-3.mat
+Loading CPU data b0 from file ./cpu_results/seq_epoch-b0-30-3.mat
+Loading CPU data b1 from file ./cpu_results/seq_epoch-b1-30-3.mat
+Loss at iteration 45 of epoch 0/1 = 2.02483
+Loading CPU data W0 from file ./cpu_results/seq_epoch-W0-45-3.mat
+Loading CPU data W1 from file ./cpu_results/seq_epoch-W1-45-3.mat
+Loading CPU data b0 from file ./cpu_results/seq_epoch-b0-45-3.mat
+Loading CPU data b1 from file ./cpu_results/seq_epoch-b1-45-3.mat
+Loss at iteration 60 of epoch 0/1 = 1.88859
+Loading CPU data W0 from file ./cpu_results/seq_epoch-W0-60-3.mat
+Loading CPU data W1 from file ./cpu_results/seq_epoch-W1-60-3.mat
+Loading CPU data b0 from file ./cpu_results/seq_epoch-b0-60-3.mat
+Loading CPU data b1 from file ./cpu_results/seq_epoch-b1-60-3.mat
+Time for Parallel Training: 9.10158 seconds
+Precision on validation set for parallel training =   0.7381666898727417
+Precision on testing set for parallel training =   0.7171999812126160
+
+Checking for correctness...
+Loading from file ./cpu_results/seq_nn-W0-3.mat
+Loading from file ./cpu_results/seq_nn-b0-3.mat
+Loading from file ./cpu_results/seq_nn-W1-3.mat
+Loading from file ./cpu_results/seq_nn-b1-3.mat
+
+The error in the GPU DNN at the completion of training is saved to ./Outputs/NNErrors-3-3.txt
+Correctness test failed
+Correctness test failed
+Max norm of diff b/w seq and par: W[0]: 0.0130246, b[0]: 17.9273
+l2  norm of diff b/w seq and par: W[0]: 0.0534504, b[0]: 16.4327
+Correctness test failed
+Correctness test failed
+Max norm of diff b/w seq and par: W[1]: 0.279229, b[1]: 6.66889
+l2  norm of diff b/w seq and par: W[1]: 0.628791, b[1]: 12.473
+
+*** Summary ***
+
+2400           0.0491578      0.803554       38.616         14.4154        0.123732       1.66173        46.4225        26.7353        
+600            0.030069       0.501159       22.5308        13.892         0.108573       1.11441        23.4037        22.1749        
+60             0.0112857      0.254683       17.1848        5.88633        0.0491674      0.570008       15.9587        10.8661        
+
+*** Grading mode 4 ***
+
+main -g 4
+Please allocate at least as many GPUs as the number of MPI procs.
+Number of processes: 4
+Number of GPUs: 3
+CUDA error at main.cpp:68 code=101(cudaErrorInvalidDevice) "cudaSetDevice(rank)" 
+--------------------------------------------------------------------------
+Primary job  terminated normally, but 1 process returned
+a non-zero exit code. Per user-direction, the job has been aborted.
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+mpirun detected that one or more processes exited with non-zero status, thus causing
+the job to be terminated. The first process to do so was:
+
+  Process name: [[23741,1],0]
+  Exit code:    1
+--------------------------------------------------------------------------
+
+*** Tests are complete ***

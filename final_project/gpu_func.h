@@ -34,6 +34,10 @@ void setzero_gpu(nn_real* mat, int M, int N);
 
 void softmax_der_gpu(const nn_real* mat, const nn_real* mat2, nn_real* mat3, int M, int N);
 
+void avg_gpu(const nn_real* data, const nn_real* weights, nn_real* res, int size, int M);
+
+void avg_gpu(const nn_real* data, nn_real* res, int size, int M);
+
 __global__ void myGEMM_kernel(const nn_real* A, const nn_real* B, nn_real* C, nn_real alpha, 
 nn_real beta, int M, int N, int K);
 
@@ -62,6 +66,10 @@ __global__ void setzero_kernel(nn_real* mat, int M, int N);
 __global__ void softmax_der_kernel(const nn_real* mat, const nn_real* mat2, nn_real* mat3, int M, int N);
 
 __global__ void argmax(const nn_real* values, nn_real* labels, int M, int N);
+
+__global__ void avg_kernel(const nn_real* data, const nn_real* weights, nn_real* res, int size, int M);
+
+__global__ void avg_kernel(const nn_real* data, nn_real* res, int size, int M);
 
 void feedforward_gpu(int n0, int n1, int n2, int nbatch, nn_real* d_X,
     nn_real* d_W0, nn_real* d_W1, nn_real* d_b0, nn_real* d_b1, nn_real* d_a1, 

@@ -321,6 +321,43 @@ __global__ void softmax_der_kernel(const nn_real* mat, const nn_real* mat2, nn_r
     }
 }
 
+void avg_gpu(const nn_real* data, const nn_real* weights, nn_real* res, int size, int M)
+{
+    avg_kernel<<<ceil(size / 256.f), 256>>>(data, weights, res, size, M);
+}
+
+void avg_gpu(const nn_real* data, nn_real* res, int size, int M)
+{
+    avg_kernel<<<ceil(size / 256.f), 256>>>(data, res, size, M);
+}
+
+__global__ void avg_kernel(const nn_real* data, nn_real* res, int size, int M)
+{
+    int idx = (blockIdx.x * blockDim.x) + threadIdx.x;
+
+    while(idx < size){
+        res[idx] = 0;
+        for (int k = 0; k < M; k++){
+            res[idx] += data[idx + k * size];
+        }
+        res[idx] /= M;
+        idx += blockDim.x * gridDim.x;
+    }
+}
+
+__global__ void avg_kernel(const nn_real* data, const nn_real* weights, nn_real* res, int size, int M)
+{
+    int idx = (blockIdx.x * blockDim.x) + threadIdx.x;
+
+    while(idx < size){
+        res[idx] = 0;
+        for (int k = 0; k < M; k++){
+            res[idx] += data[idx + k * size] * weights[k];
+        }
+        idx += blockDim.x * gridDim.x;
+    }
+}
+
 /*
 Routine to do the forward pass through the neural network nn
 */
