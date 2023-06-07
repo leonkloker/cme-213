@@ -252,103 +252,6 @@ void train(NeuralNetwork &nn, const arma::Mat<nn_real> &X,
 }
 
 /*
-Routine to do the forward pass through the neural network nn
-*/
-void feedforward_gpu(NeuralNetwork &nn, const arma::Mat<nn_real> &X,
-                 struct cache &cache){
-    
-    // Set size of cache
-    cache.z.resize(2);
-    cache.a.resize(2);
-
-    // Check that the input matrix has the correct number of rows
-    assert(X.n_rows == nn.W[0].n_cols);
-    cache.X = X;
-
-    // Forward propagate through first dense layer
-    arma::Mat<nn_real> Z1(nn.W[0].n_rows, X.n_cols), A1(nn.W[0].n_rows, X.n_cols),
-                       Z2(nn.W[1].n_rows, X.n_cols), A2(nn.W[1].n_rows, X.n_cols);
-    repmat_gpu(nn.b[0].memptr(), Z1.memptr(), nn.b[0].n_rows, nn.b[0].n_cols, 1, X.n_cols);
-    myGEMM(nn.W[0].memptr(), X.memptr(), Z1.memptr(), 1.0, 1.0, nn.W[0].n_rows, X.n_cols, nn.W[0].n_cols);
-    cache.z[0] = Z1;
-
-    // Apply sigmoid
-    sigmoid_gpu(Z1.memptr(), A1.memptr(), Z1.n_rows, Z1.n_cols);
-    cache.a[0] = A1;
-
-    // Forward propagate through second dense layer
-    repmat_gpu(nn.b[1].memptr(), Z2.memptr(), nn.b[1].n_rows, nn.b[1].n_cols, 1, X.n_cols);
-    myGEMM(nn.W[1].memptr(), A1.memptr(), Z2.memptr(), 1.0, 1.0, nn.W[1].n_rows, A1.n_cols, nn.W[1].n_cols);
-    cache.z[1] = Z2;
-
-    // Apply softmax
-    softmax_gpu(Z2.memptr(), A2.memptr(), Z2.n_rows, Z2.n_cols);
-    cache.a[1] = A2;
-    cache.yc = A2;
-}
-
-/*
-Routine to do a prediction using a neural network nn
-*/
-void predict_gpu(NeuralNetwork &nn, const arma::Mat<nn_real> &X,
-             arma::Row<nn_real> &label)
-{
-    struct cache fcache;
-    feedforward_gpu(nn, X, fcache);
-    label.set_size(X.n_cols);
-
-    // Find the label with the highest probability
-    for (int i = 0; i < X.n_cols; ++i)
-    {
-        arma::uword row;
-        fcache.yc.col(i).max(row);
-        label(i) = row;
-    }
-}
-
-/*
-Routine to do the backward pass through the neural network nn
-*/
-void backprop_gpu(NeuralNetwork &nn, const arma::Mat<nn_real> &y, nn_real reg,
-              const struct cache &bpcache, struct grads &bpgrads)
-{
-    // Set size of gradients
-    bpgrads.dW.resize(2);
-    bpgrads.db.resize(2);
-    int N = y.n_cols;
-
-    // std::cout << "backprop " << bpcache.yc << "\n";
-
-    // Initialize placeholders for intermediate values
-    arma::Mat<nn_real> Diff(y.n_rows, y.n_cols), A0T(bpcache.a[0].n_cols, bpcache.a[0].n_rows), 
-                      dA1(nn.W[1].n_cols, y.n_cols), W1T(nn.W[1].n_rows, nn.W[1].n_cols),
-                      dZ1(bpcache.a[0].n_rows, bpcache.a[0].n_cols), XT(bpcache.X.n_cols, bpcache.X.n_rows);
-
-    // Calculate gradients in last layer
-    addmat_gpu(bpcache.yc.memptr(), y.memptr(), Diff.memptr(), 1.f / N, -1.f / N, bpcache.yc.n_rows, bpcache.yc.n_cols);
-
-    transpose_gpu(bpcache.a[0].memptr(), A0T.memptr(), bpcache.a[0].n_rows, bpcache.a[0].n_cols);
-    bpgrads.dW[1] = nn.W[1];
-    myGEMM(Diff.memptr(), A0T.memptr(), bpgrads.dW[1].memptr(), 1.0, reg, Diff.n_rows, A0T.n_cols, Diff.n_cols);
-
-    bpgrads.db[1] = arma::sum(Diff, 1);
-
-    // Calculate gradients in first layer
-    transpose_gpu(nn.W[1].memptr(), W1T.memptr(), nn.W[1].n_rows, nn.W[1].n_cols);
-    myGEMM(W1T.memptr(), Diff.memptr(), dA1.memptr(), 1.0, 0.0, W1T.n_rows, Diff.n_cols, W1T.n_cols);
-
-    dZ1 = 1 - bpcache.a[0];
-    elemmultmat_gpu(bpcache.a[0].memptr(), dZ1.memptr(), 1.0, dZ1.n_rows, dZ1.n_cols);
-    elemmultmat_gpu(dA1.memptr(), dZ1.memptr(), 1.0, dZ1.n_rows, dZ1.n_cols);
-
-    transpose_gpu(bpcache.X.memptr(), XT.memptr(), bpcache.X.n_rows, bpcache.X.n_cols);
-    bpgrads.dW[0] = nn.W[0];
-    myGEMM(dZ1.memptr(), XT.memptr(), bpgrads.dW[0].memptr(), 1.0, reg, dZ1.n_rows, XT.n_cols, dZ1.n_cols);
-
-    bpgrads.db[0] = arma::sum(dZ1, 1);
-}
-
-/*
  * Train the neural network &nn of rank 0 in parallel. Your MPI implementation
  * should mainly be in this function.
  */
@@ -399,14 +302,55 @@ void parallel_train(NeuralNetwork &nn, const arma::Mat<nn_real> &X,
     mini_batch_size_alloc = max_batch_size / num_procs + 1;
   }
 
-  // TODO
+  // Network dimensions
+  int n0 = nn.H[0];
+  int n1 = nn.H[1];
+  int n2 = nn.H[2];
+  int nbatch = batch_size;
+
+  // Network parameters
+  nn_real* d_W1, *d_W2, *d_b1, *d_b2;
+  nn_real* d_a1, *d_a2, *d_z1, *d_z2;
+  nn_real* d_dW1, *d_dW2, *d_db1, *d_db2;
+  nn_real* d_h1, *d_h2, *d_h3, *d_h4, *d_h5, *d_h6;
+  nn_real* d_X, *d_y;
+
+  // Allocate memory
+  cudaMalloc(&d_X, n0 * nbatch * sizeof(nn_real));
+  cudaMalloc(&d_y, n2 * nbatch * sizeof(nn_real));
+  cudaMalloc(&d_W1, n1 * n0 * sizeof(nn_real));
+  cudaMalloc(&d_W2, n2 * n1 * sizeof(nn_real));
+  cudaMalloc(&d_b1, n1 * sizeof(nn_real));
+  cudaMalloc(&d_b2, n2 * sizeof(nn_real));
+  cudaMalloc(&d_a1, n1 * nbatch * sizeof(nn_real));
+  cudaMalloc(&d_a2, n2 * nbatch * sizeof(nn_real));
+  cudaMalloc(&d_z1, n1 * nbatch * sizeof(nn_real));
+  cudaMalloc(&d_z2, n2 * nbatch * sizeof(nn_real));
+  cudaMalloc(&d_dW1, n1 * n0 * sizeof(nn_real));
+  cudaMalloc(&d_dW2, n2 * n1 * sizeof(nn_real));
+  cudaMalloc(&d_db1, n1 * sizeof(nn_real));
+  cudaMalloc(&d_db2, n2 * sizeof(nn_real));
+  cudaMalloc(&d_h1, n2 * nbatch * sizeof(nn_real));
+  cudaMalloc(&d_h2, nbatch * n1 * sizeof(nn_real));
+  cudaMalloc(&d_h3, n1 * n2 * sizeof(nn_real));
+  cudaMalloc(&d_h4, n1 * nbatch * sizeof(nn_real));
+  cudaMalloc(&d_h5, n1 * nbatch * sizeof(nn_real));
+  cudaMalloc(&d_h6, nbatch * n0 * sizeof(nn_real));
+
+  // Copy data to GPU
+  cudaMemcpy(d_W1, nn.W[0].memptr(), n1 * n0 * sizeof(nn_real), cudaMemcpyHostToDevice);
+  cudaMemcpy(d_W2, nn.W[1].memptr(), n2 * n1 * sizeof(nn_real), cudaMemcpyHostToDevice);
+  cudaMemcpy(d_b1, nn.b[0].memptr(), n1 * sizeof(nn_real), cudaMemcpyHostToDevice);
+  cudaMemcpy(d_b2, nn.b[1].memptr(), n2 * sizeof(nn_real), cudaMemcpyHostToDevice);
 
   /* iter is a variable used to manage debugging. It increments in the inner
      loop and therefore goes from 0 to epochs*num_batches */
   int iter = 0;
+  int last_col = 0;
 
   for (int epoch = 0; epoch < epochs; ++epoch)
   {
+    nbatch = batch_size;
     for (int batch = 0; batch < num_batches; ++batch)
     {
       /*
@@ -419,23 +363,61 @@ void parallel_train(NeuralNetwork &nn, const arma::Mat<nn_real> &X,
        * 4. update local network coefficient at each node
        */
 
+      last_col = (batch + 1) * batch_size - 1;
+ 
+      if ((batch + 1) * batch_size >= X.n_cols)
+      {
+        last_col = X.n_cols - 1;
+        nbatch = last_col - batch * batch_size + 1;
+      }
+
+      arma::Mat<nn_real> X_batch = X.cols(batch * batch_size, last_col);
+      arma::Mat<nn_real> y_batch = y.cols(batch * batch_size, last_col);
+
+      cudaMemcpy(d_X, X_batch.memptr(), n0 * nbatch * sizeof(nn_real), cudaMemcpyHostToDevice);
+      cudaMemcpy(d_y, y_batch.memptr(), n2 * nbatch * sizeof(nn_real), cudaMemcpyHostToDevice);
+
       // +-*=+-*=+-*=+-*=+-*=+-*=+-*=+-*=+*-=+-*=+*-=+-*=+-*=+-*=+-*=+-*= //
       //                          FEED FORWARD                            //
       // +-*=+-*=+-*=+-*=+-*=+-*=+-*=+-*=+*-=+-*=+*-=+-*=+-*=+-*=+-*=+-*= //
-      /* z1 = W1 x + b1 */
-
+      
+      feedforward_gpu(n0, n1, n2, nbatch, d_X, d_W1, d_W2, d_b1, d_b2, d_a1, 
+                      d_a2, d_z1, d_z2);
+      
       // +-*=+-*=+-*=+-*=+-*=+-*=+-*=+-*=+*-=+-*=+*-=+-*=+-*=+-*=+-*=+-*= //
       //                         BACK PROPAGATE                           //
       // +-*=+-*=+-*=+-*=+-*=+-*=+-*=+-*=+*-=+-*=+*-=+-*=+-*=+-*=+-*=+-*= //
-      /* db2 = y_hat - y */
+      
+      backprop_gpu(n0, n1, n2, nbatch, d_a1, d_a2, d_z1, d_z2, d_W1, d_W2,
+                  d_X, d_b1, d_b2, d_y, d_db1, d_db2, d_dW1, d_dW2, d_h1, d_h2,
+                  d_h3, d_h4, d_h5, d_h6, reg);
 
       // +-*=+-*=+-*=+-*=+-*=+-*=+-*=+-*=+*-=+-*=+*-=+-*=+-*=+-*=+-*=+-*= //
       //                    GRADIENT DESCENT STEP                         //
       // +-*=+-*=+-*=+-*=+-*=+-*=+-*=+-*=+*-=+-*=+*-=+-*=+-*=+-*=+-*=+-*= //
 
+      gradient_descent_gpu(n0, n1, n2, d_W1, d_W2, d_b1, d_b2,
+                          d_db1, d_db2, d_dW1, d_dW2, learning_rate);
+
       // +-*=+-*=+-*=+-*=+-*=+-*=+-*=+-*=+*-=+-*=+*-=+-*=+-*=+-*=+-*=+-*= //
       //                    POST-PROCESS OPTIONS                          //
       // +-*=+-*=+-*=+-*=+-*=+-*=+-*=+-*=+*-=+-*=+*-=+-*=+-*=+-*=+-*=+-*= //
+
+      if (print_every > 0 && iter % print_every == 0)
+      {
+        cudaMemcpy(nn.W[0].memptr(), d_W1, n1 * n0 * sizeof(nn_real), cudaMemcpyDeviceToHost);
+        cudaMemcpy(nn.W[1].memptr(), d_W2, n2 * n1 * sizeof(nn_real), cudaMemcpyDeviceToHost);
+        cudaMemcpy(nn.b[0].memptr(), d_b1, n1 * sizeof(nn_real), cudaMemcpyDeviceToHost);
+        cudaMemcpy(nn.b[1].memptr(), d_b2, n2 * sizeof(nn_real), cudaMemcpyDeviceToHost);
+
+        arma::Mat<nn_real> y_hat_batch(n2, nbatch);
+        cudaMemcpy(y_hat_batch.memptr(), d_a2, n2 * nbatch * sizeof(nn_real), cudaMemcpyDeviceToHost);
+
+        std::cout << "Loss at iteration " << iter << " of epoch " << epoch
+                  << "/" << epochs << " = "
+                  << loss(nn, y_hat_batch, y_batch, reg) << "\n";
+      }
+      
       if (print_every <= 0)
       {
         print_flag = batch == 0;
@@ -466,7 +448,33 @@ void parallel_train(NeuralNetwork &nn, const arma::Mat<nn_real> &X,
   //                  Update Neural Network on CPU                    //
   // +-*=+-*=+-*=+-*=+-*=+-*=+-*=+-*=+*-=+-*=+*-=+-*=+-*=+-*=+-*=+-*= //
 
+  cudaMemcpy(nn.W[0].memptr(), d_W1, n1 * n0 * sizeof(nn_real), cudaMemcpyDeviceToHost);
+  cudaMemcpy(nn.W[1].memptr(), d_W2, n2 * n1 * sizeof(nn_real), cudaMemcpyDeviceToHost);
+  cudaMemcpy(nn.b[0].memptr(), d_b1, n1 * sizeof(nn_real), cudaMemcpyDeviceToHost);
+  cudaMemcpy(nn.b[1].memptr(), d_b2, n2 * sizeof(nn_real), cudaMemcpyDeviceToHost);
+
   // +-*=+-*=+-*=+-*=+-*=+-*=+-*=+-*=+*-=+-*=+*-=+-*=+-*=+-*=+-*=+-*= //
   //                    Free memory allocations                       //
   // +-*=+-*=+-*=+-*=+-*=+-*=+-*=+-*=+*-=+-*=+*-=+-*=+-*=+-*=+-*=+-*= //
+
+  cudaFree(d_W1);
+  cudaFree(d_W2);
+  cudaFree(d_b1);
+  cudaFree(d_b2);
+  cudaFree(d_db1);
+  cudaFree(d_db2);
+  cudaFree(d_dW1);
+  cudaFree(d_dW2);
+  cudaFree(d_X);
+  cudaFree(d_y);
+  cudaFree(d_a1);
+  cudaFree(d_a2);
+  cudaFree(d_z1);
+  cudaFree(d_z2);
+  cudaFree(d_h1);
+  cudaFree(d_h2);
+  cudaFree(d_h3);
+  cudaFree(d_h4);
+  cudaFree(d_h5);
+  cudaFree(d_h6);
 }

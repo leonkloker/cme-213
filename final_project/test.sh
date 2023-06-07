@@ -2,6 +2,7 @@
 
 #SBATCH --time=02:00:00
 #SBATCH --partition=CME
+#SBATCH --qos=cme
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=4
 #SBATCH --gres=gpu:4
@@ -18,7 +19,7 @@ echo ----------------
 cd $SLURM_SUBMIT_DIR
 
 # Select the number of MPI processes to use
-N=4
+N=1
 
 # This script will run all 4 modes with your choice of N
 

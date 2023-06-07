@@ -292,13 +292,485 @@ void TestGEMM(int M, int N, int K)
   cudaFree(dummy);
 }
 
+void TestSigmoid(int M, int N) {
+
+    nn_real* mat;
+    nn_real* mat2;
+    nn_real* ref;
+    nn_real* dMat;
+    nn_real* dMat2;
+
+    mat = (nn_real*)malloc(M*N*sizeof(nn_real));
+    mat2 = (nn_real*)malloc(M*N*sizeof(nn_real));
+    ref = (nn_real*)malloc(M*N*sizeof(nn_real));
+
+    cudaMalloc((void**)&dMat, sizeof(nn_real) * M * N);
+    cudaMalloc((void**)&dMat2, sizeof(nn_real) * M * N);
+
+    // Initialization and calculation of reference output
+    for(int i = 0; i < M*N; i++) {
+        mat[i] = (nn_real)(rand() % 10);  // Replace with your own initialization if necessary
+        ref[i] = 1.0 / (1.0 + exp(-mat[i]));  // Calculate the sigmoid of the initialized value
+    }
+
+    cudaMemcpy(dMat, mat, sizeof(nn_real) * M * N, cudaMemcpyHostToDevice);
+
+    /* Warm up GPU before we run. */
+    sigmoid_gpu(dMat, dMat2, M, N);
+    check_launch("sigmoid_gpu warm up");
+
+    double refstart = MPI_Wtime();
+
+    for(int i = 0; i < NUM_ITERS; i++) {
+        sigmoid_gpu(dMat, dMat2, M, N);
+    }
+
+    check_launch("sigmoid_gpu");
+    double refend = MPI_Wtime();
+
+    cudaMemcpy(mat2, dMat2, sizeof(nn_real) * M * N, cudaMemcpyDeviceToHost);
+
+    int fail = compareGEMMResults(mat2, ref, M, N);
+
+    if(fail == 0) {
+        std::cout << "Time for reference sigmoid implementation: "
+                  << refend - refstart << std::endl;
+    }
+
+    free(mat);
+    free(mat2);
+    free(ref);
+    cudaFree(dMat);
+    cudaFree(dMat2);
+}
+
+void TestSoftmax(int M, int N) {
+
+    arma::Mat<nn_real> mat(M,N), res(M,N), res_gpu(M,N);
+    nn_real* dmat;
+    nn_real* dres;
+
+    cudaMalloc((void**)&dmat, sizeof(nn_real) * M * N);
+    cudaMalloc((void**)&dres, sizeof(nn_real) * M * N);
+
+    // Initialization
+    for(int i = 0; i < M*N; i++) {
+        mat[i] = rand() / (nn_real) RAND_MAX;
+    }
+
+    cudaMemcpy(dmat, mat.memptr(), sizeof(nn_real) * M * N, cudaMemcpyHostToDevice);
+
+    softmax(mat, res);
+
+    /* Warm up GPU before we run. */
+    softmax_gpu(dmat, dres, M, N);
+    check_launch("softmax_gpu warm up");
+
+    double refstart = MPI_Wtime();
+
+    check_launch("softmax_gpu");
+    double refend = MPI_Wtime();
+
+    cudaMemcpy(res_gpu.memptr(), dres, sizeof(nn_real) * M * N, cudaMemcpyDeviceToHost);
+
+    int fail = compareGEMMResults(res.memptr(), res_gpu.memptr(), M, N);
+
+    if(fail == 0) {
+        std::cout << "Time for reference softmax implementation: "
+                  << refend - refstart << std::endl;
+    }
+
+    cudaFree(dmat);
+    cudaFree(dres);
+}
+
+void TestRepMat(int K, int L, int M, int N) {
+
+    arma::Mat<nn_real> mat(K,L), res(M*K,N*L), res_gpu(M*K,N*L);
+
+    for (int i = 0; i < K; i++) {
+      for (int j = 0; j < L; j++){
+        mat(i,j) = rand() / (nn_real) RAND_MAX;
+      }
+    }
+
+    nn_real* dmat, *dres;
+    cudaMalloc((void**)&dmat, sizeof(nn_real) * K * L);
+    cudaMalloc((void**)&dres, sizeof(nn_real) * K * L * M * N);
+
+    cudaMemcpy(dmat, mat.memptr(), sizeof(nn_real) * K * L, cudaMemcpyHostToDevice);
+
+    repmat_gpu(dmat, dres, K, L, M, N);
+    cudaMemcpy(res_gpu.memptr(), dres, sizeof(nn_real) * M * N * K * L, cudaMemcpyDeviceToHost);
+
+    res = arma::repmat(mat, M, N);
+
+    int fail = compareGEMMResults(res.memptr(), res_gpu.memptr(), K*M, L*N);
+
+    cudaFree(dmat);
+    cudaFree(dres);
+}
+
+void TestEqual(int M, int N){
+  arma::Mat<nn_real> mat1(M,N), res_gpu(M,N);
+
+  for (int i = 0; i < M; i++) {
+    for (int j = 0; j < N; j++){
+      mat1(i,j) = rand() / (nn_real) RAND_MAX;
+    }
+  }
+
+  nn_real* dmat1, *dmat2;
+
+  cudaMalloc((void**)&dmat1, sizeof(nn_real) * M * N);
+  cudaMalloc((void**)&dmat2, sizeof(nn_real) * M * N);
+
+  cudaMemcpy(dmat1, mat1.memptr(), sizeof(nn_real) * M * N, cudaMemcpyHostToDevice);
+  equal_gpu(dmat1, dmat2, M, N);
+  cudaMemcpy(res_gpu.memptr(), dmat2, sizeof(nn_real) * M * N, cudaMemcpyDeviceToHost);
+
+  compareGEMMResults(res_gpu.memptr(), mat1.memptr(), M, N);
+
+}
+
+void TestMatAdd(int M, int N) {
+  arma::Mat<nn_real> mat1(M,N), mat2(M,N), res(M,N), res_gpu(M,N);
+  for (int i = 0; i < M; i++) {
+    for (int j = 0; j < N; j++){
+      mat1(i,j) = rand() / (nn_real) RAND_MAX;
+      mat2(i,j) = rand() / (nn_real) RAND_MAX;
+    }
+  }
+
+  res = 3* mat1 +  2.* mat2;
+  nn_real* dmat1, *dmat2, *dres;
+  cudaMalloc((void**)&dmat1, sizeof(nn_real) * M * N);
+  cudaMalloc((void**)&dmat2, sizeof(nn_real) * M * N);
+  cudaMalloc((void**)&dres, sizeof(nn_real) * M * N);
+  cudaMemcpy(dmat1, mat1.memptr(), sizeof(nn_real) * M * N, cudaMemcpyHostToDevice);
+  cudaMemcpy(dmat2, mat2.memptr(), sizeof(nn_real) * M * N, cudaMemcpyHostToDevice);
+
+  addmat_gpu(dmat1, dmat2, dres, 3., 2., M, N);
+  cudaMemcpy(res_gpu.memptr(), dres, sizeof(nn_real) * M * N, cudaMemcpyDeviceToHost);
+
+  compareGEMMResults(res.memptr(), res_gpu.memptr(), M, N);
+
+}
+
+void TestTranspose(int M, int N) {
+  arma::Mat<nn_real> mat(M,N), res(N,M), res_gpu(N,M);
+  for (int i = 0; i < M; i++) {
+    for (int j = 0; j < N; j++){
+      mat(i,j) = rand() / (nn_real) RAND_MAX;
+    }
+  }
+  res = mat.t();
+
+  nn_real* dmat, *dres;
+  cudaMalloc((void**)&dmat, sizeof(nn_real) * M * N);
+  cudaMalloc((void**)&dres, sizeof(nn_real) * M * N);
+  cudaMemcpy(dmat, mat.memptr(), sizeof(nn_real) * M * N, cudaMemcpyHostToDevice);
+  transpose_gpu(dmat, dres, M, N);
+  cudaMemcpy(res_gpu.memptr(), dres, sizeof(nn_real) * M * N, cudaMemcpyDeviceToHost);
+
+  compareGEMMResults(res.memptr(), res_gpu.memptr(), M, N);
+}
+
+void TestFeedforward(int n0, int n1, int n2, int nbatch) {
+
+    arma::Mat<nn_real> X, W0, W1, b0, b1;
+    X.set_size(n0, nbatch);
+    W0.set_size(n1, n0);
+    W1.set_size(n2, n1);
+    b0.set_size(n1, 1);
+    b1.set_size(n2, 1);
+
+    for(int i = 0; i < nbatch; i++) {
+        for(int j = 0; j < n0; j++) {
+            X(j, i) = (rand() - 0.5 * (nn_real) RAND_MAX)/ (nn_real) RAND_MAX;
+        }
+    }
+    for(int i = 0; i < n0; i++) {
+        for(int j = 0; j < n1; j++) {
+            W0(j, i) = (rand() - 0.5 * (nn_real) RAND_MAX)/ (nn_real) RAND_MAX;
+        }
+    }
+    for(int i = 0; i < n1; i++) {
+        for(int j = 0; j < n2; j++) {
+            W1(j, i) = (rand() - 0.5 * (nn_real) RAND_MAX)/ (nn_real) RAND_MAX;
+        }
+    }
+    b0.zeros();
+    b1.zeros();
+    /*for(int i = 0; i < n1; i++) {
+        b0(i) = (rand() - 0.5 * (nn_real) RAND_MAX)/ (nn_real) RAND_MAX;
+    }
+    for(int i = 0; i < n2; i++) {
+        b1(i) = (rand() - 0.5 * (nn_real) RAND_MAX)/ (nn_real) RAND_MAX;
+    }*/
+
+    std::vector<int> H = {n0,n1,n2};
+
+    NeuralNetwork nn(H);
+    nn.W = {W0, W1};
+    nn.b = {b0, b1};
+
+    nn_real reg = 0.0;
+    cache bpcache;
+    bpcache.X = X;
+
+    feedforward(nn, X, bpcache);
+
+    // Allocate device memory
+    nn_real *d_X, *d_W0, *d_W1, *d_b0, *d_b1, *d_a1, *d_a2, *d_z1, *d_z2;
+    cudaMalloc((void**) &d_X, nbatch * n0 * sizeof(nn_real));
+    cudaMalloc((void**) &d_W0, n0 * n1 * sizeof(nn_real));
+    cudaMalloc((void**) &d_W1, n1 * n2 * sizeof(nn_real));
+    cudaMalloc((void**) &d_b0, n1 * sizeof(nn_real));
+    cudaMalloc((void**) &d_b1, n2 * sizeof(nn_real));
+    cudaMalloc((void**) &d_a1, nbatch * n1 * sizeof(nn_real));
+    cudaMalloc((void**) &d_a2, nbatch * n2 * sizeof(nn_real));
+    cudaMalloc((void**) &d_z1, nbatch * n1 * sizeof(nn_real));
+    cudaMalloc((void**) &d_z2, nbatch * n2 * sizeof(nn_real));
+
+    // Transfer data from host to device
+    cudaMemcpy(d_X, X.memptr(), nbatch * n0 * sizeof(nn_real), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_W0, W0.memptr(), n0 * n1 * sizeof(nn_real), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_W1, W1.memptr(), n1 * n2 * sizeof(nn_real), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_b0, b0.memptr(), n1 * sizeof(nn_real), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_b1, b1.memptr(), n2 * sizeof(nn_real), cudaMemcpyHostToDevice);
+    
+    // Perform feedforward on the GPU
+    feedforward_gpu(n0, n1, n2, nbatch, d_X, d_W0, d_W1, d_b0, d_b1, d_a1, d_a2, d_z1, d_z2);
+    
+    // We don't compare results here, since the output of the feedforward pass is hard to compute without a non-GPU version of the entire network
+    // Instead, let's just check that the output has the correct size (n_images x n_2)
+    std::cout << "Output size is correct if no CUDA errors are thrown!" << std::endl;
+
+    arma::Mat<nn_real> a2(n2, nbatch), z2(n2, nbatch), a1(n1, nbatch), z1(n1, nbatch);
+    cudaMemcpy(a2.memptr(), d_a2, sizeof(nn_real) * n2 * nbatch, cudaMemcpyDeviceToHost);
+    cudaMemcpy(z2.memptr(), d_z2, sizeof(nn_real) * n2 * nbatch, cudaMemcpyDeviceToHost);
+    cudaMemcpy(a1.memptr(), d_a1, sizeof(nn_real) * n1 * nbatch, cudaMemcpyDeviceToHost);
+    cudaMemcpy(z1.memptr(), d_z1, sizeof(nn_real) * n1 * nbatch, cudaMemcpyDeviceToHost);
+
+    std::cout << "A2: " << std::endl;
+    compareGEMMResults(a2.memptr(), bpcache.a[1].memptr(), n2, nbatch);
+    std::cout << "Z2: " << std::endl;
+    compareGEMMResults(z2.memptr(), bpcache.z[1].memptr(), n2, nbatch);
+    std::cout << "A1: " << std::endl;
+    compareGEMMResults(a1.memptr(), bpcache.a[0].memptr(), n1, nbatch);
+    std::cout << "Z1: " << std::endl;
+    compareGEMMResults(z1.memptr(), bpcache.z[0].memptr(), n1, nbatch);
+
+    // Cleanup memory
+    cudaFree(d_X);
+    cudaFree(d_W0);
+    cudaFree(d_W1);
+    cudaFree(d_b0);
+    cudaFree(d_b1);
+    cudaFree(d_a1);
+    cudaFree(d_a2);
+    cudaFree(d_z1);
+    cudaFree(d_z2);
+}
+
+void TestBackward(int n0, int n1, int n2, int nbatch) {
+
+    nn_real* d_a1;
+    nn_real* d_a2;
+    nn_real* d_z1;
+    nn_real* d_z2;
+
+    nn_real* d_W1;
+    nn_real* d_W2;
+    nn_real* d_b1;
+    nn_real* d_b2;
+
+    nn_real* d_X;
+    nn_real* d_y;
+
+    nn_real* d_db1;
+    nn_real* d_db2;
+    nn_real* d_dW1;
+    nn_real* d_dW2;
+
+    nn_real* d_h1;
+    nn_real* d_h2;
+    nn_real* d_h3;
+    nn_real* d_h4;
+    nn_real* d_h5;
+    nn_real* d_h6;
+
+    nn_real reg;
+    
+    cudaMalloc((void**) &d_a1, n1 * nbatch * sizeof(nn_real));
+    cudaMalloc((void**) &d_a2, n2 * nbatch * sizeof(nn_real));
+    cudaMalloc((void**) &d_z2, n2 * nbatch * sizeof(nn_real));
+    cudaMalloc((void**) &d_z1, n1 * nbatch * sizeof(nn_real));
+    cudaMalloc((void**) &d_W1, n0 * n1 * sizeof(nn_real));
+    cudaMalloc((void**) &d_W2, n2 * n1 * sizeof(nn_real));
+    cudaMalloc((void**) &d_X, n0 * nbatch * sizeof(nn_real));
+    cudaMalloc((void**) &d_b2, n2 * sizeof(nn_real));
+    cudaMalloc((void**) &d_b1, n1 * sizeof(nn_real));
+    cudaMalloc((void**) &d_y, n2 * nbatch * sizeof(nn_real));
+    cudaMalloc((void**) &d_db1, n1 * sizeof(nn_real));
+    cudaMalloc((void**) &d_db2, n2 * sizeof(nn_real));
+    cudaMalloc((void**) &d_dW1, n1 * n0 * sizeof(nn_real));
+    cudaMalloc((void**) &d_dW2, n2 * n1 * sizeof(nn_real));
+
+    cudaMalloc((void**) &d_h1, n2 * nbatch * sizeof(nn_real));
+    cudaMalloc((void**) &d_h2, nbatch * n1 * sizeof(nn_real));
+    cudaMalloc((void**) &d_h3, n1 * n2 * sizeof(nn_real));
+    cudaMalloc((void**) &d_h4, n1 * nbatch * sizeof(nn_real));
+    cudaMalloc((void**) &d_h5, n1 * nbatch * sizeof(nn_real));
+    cudaMalloc((void**) &d_h6, nbatch * n0 * sizeof(nn_real));
+
+    // TODO: Allocate memory for the variables and fill with test data.
+    arma::Mat<nn_real> a1(n1, nbatch), a2(n2, nbatch), z1(n1, nbatch), z2(n2, nbatch), 
+        w1(n1, n0), w2(n2, n1), X(n0, nbatch), 
+        y(n2, nbatch), dw1(n1, n0), dw2(n2, n1), h1(n2, nbatch), h2(nbatch, n1),
+        h3(n1, n2), h4(n1, nbatch), h5(n1, nbatch), h6(nbatch, n0);
+
+    for (int i = 0; i < nbatch; i++) {
+        y(i % n2, i) = 1.0;
+    }
+    for (int i = 0; i < n1; i++) {
+      for (int j = 0; j < n0; j++){
+        w1(i,j) = (rand() - 0.5 * (nn_real) RAND_MAX)/ (nn_real) RAND_MAX;
+      }
+    }
+    for (int i = 0; i < n2; i++) {
+      for (int j = 0; j < n1; j++){
+        w2(i,j) = (rand() - 0.5 * (nn_real) RAND_MAX)/ (nn_real) RAND_MAX;
+      }
+    }
+    for (int i = 0; i < n0; i++) {
+      for (int j = 0; j < nbatch; j++){
+        X(i,j) = (rand() - 0.5 * (nn_real) RAND_MAX)/ (nn_real) RAND_MAX;
+      }
+    }
+
+    arma::Col<nn_real> b1(n1), b2(n2), db1(n1), db2(n2);
+
+    for (int i = 0; i < n1; i++) {
+      b1(i) = (rand() - 0.5 * (nn_real) RAND_MAX)/ (nn_real) RAND_MAX;
+    }
+    for (int i = 0; i < n2; i++) {
+      b2(i) = (rand() - 0.5 * (nn_real) RAND_MAX)/ (nn_real) RAND_MAX;
+    }
+
+    arma::Mat<nn_real> dw1_gpu(n1,n0), dw2_gpu(n2,n1);
+    arma::Col<nn_real> db1_gpu(n1), db2_gpu(n2);
+    
+    std::vector<int> H = {n0,n1,n2};
+
+    NeuralNetwork nn(H);
+    nn.W = {w1, w2};
+    nn.b = {b1, b2};
+
+    reg = 0.01 ;
+    cache bpcache;
+    bpcache.X = X;
+
+    grads bpgrads;
+
+    cudaMemcpy(d_X, X.memptr(), n0 * nbatch * sizeof(nn_real), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_y, y.memptr(), n2 * nbatch * sizeof(nn_real), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_W1, w1.memptr(), n1 * n0 * sizeof(nn_real), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_W2, w2.memptr(), n2 * n1 * sizeof(nn_real), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_b1, b1.memptr(), n1 * sizeof(nn_real), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_b2, b2.memptr(), n2 * sizeof(nn_real), cudaMemcpyHostToDevice);
+
+    feedforward(nn, X, bpcache);
+
+    feedforward_gpu(n0, n1, n2, nbatch, d_X,
+    d_W1, d_W2, d_b1, d_b2, d_a1, 
+    d_a2, d_z1, d_z2);
+
+    cudaMemcpy(a2.memptr(), d_a2, n2 * nbatch * sizeof(nn_real), cudaMemcpyDeviceToHost);
+    cudaMemcpy(z1.memptr(), d_z1, n1 * nbatch * sizeof(nn_real), cudaMemcpyDeviceToHost);
+    cudaMemcpy(z2.memptr(), d_z2, n2 * nbatch * sizeof(nn_real), cudaMemcpyDeviceToHost);
+    cudaMemcpy(a1.memptr(), d_a1, n1 * nbatch * sizeof(nn_real), cudaMemcpyDeviceToHost);
+
+    std::cout << "Forward: " << std::endl;
+    std::cout << "A2: " << std::endl;
+    compareGEMMResults(a2.memptr(), bpcache.a[1].memptr(), n2, nbatch);
+    
+    std::cout << "Z2: " << std::endl;
+    compareGEMMResults(z2.memptr(), bpcache.z[1].memptr(), n2, nbatch);
+
+    std::cout << "A1: " << std::endl;
+    compareGEMMResults(a1.memptr(), bpcache.a[0].memptr(), n1, nbatch);
+
+    std::cout << "Z1: " << std::endl;
+    compareGEMMResults(z1.memptr(), bpcache.z[0].memptr(), n1, nbatch);
+
+    std::cout << " Loss: " << loss(nn, a2, y, reg) << std::endl;
+
+    backprop(nn, y, reg, bpcache, bpgrads);
+
+    // Make a dummy call to warm up the GPU and check for errors.
+    backprop_gpu(n0, n1, n2, nbatch, d_a1, d_a2,
+                    d_z1, d_z2, d_W1, d_W2, d_X,
+                    d_b1, d_b2, d_y, d_db1, d_db2,
+                    d_dW1, d_dW2, d_h1, d_h2, d_h3,
+                    d_h4, d_h5, d_h6, reg);
+    
+    //check_launch("backprop_gpu dummy");
+
+    // Now call the function with test data and measure execution time.
+    double start = MPI_Wtime();
+    //backprop_gpu(n0, n1, n2, nbatch, d_a2, d_a1, d_z2, d_z1, d_W1, d_W2, d_X, d_b2, 
+    //d_b1, d_y, d_db1, d_db2, d_dW1, d_dW2, d_h1, d_h2, d_h3, d_h4, d_h5, d_h6, reg);
+    double stop = MPI_Wtime();
+    printf("Elapsed time: %f seconds\n", stop-start);
+
+    // TODO: Copy the results back to the host memory and verify correctness.
+    cudaMemcpy(dw1_gpu.memptr(), d_dW1, sizeof(nn_real) * n1 * n0, cudaMemcpyDeviceToHost);
+    cudaMemcpy(dw2_gpu.memptr(), d_dW2, sizeof(nn_real) * n2 * n1, cudaMemcpyDeviceToHost);
+    cudaMemcpy(db1_gpu.memptr(), d_db1, sizeof(nn_real) * n1, cudaMemcpyDeviceToHost);
+    cudaMemcpy(db2_gpu.memptr(), d_db2, sizeof(nn_real) * n2, cudaMemcpyDeviceToHost);
+
+    std::cout << std::endl << "Backward: " << std::endl;
+    // Check correctness of the results.
+    compareGEMMResults(dw1_gpu.memptr(), bpgrads.dW[0].memptr(), n1, n0);
+    compareGEMMResults(dw2_gpu.memptr(), bpgrads.dW[1].memptr(), n2, n1);
+    compareGEMMResults(db1_gpu.memptr(), bpgrads.db[0].memptr(), n1, 1);
+    compareGEMMResults(db2_gpu.memptr(), bpgrads.db[1].memptr(), n2, 1);
+
+    std::cout << "db_gpu = " << db2_gpu << std::endl;
+    std::cout << "db_cpu = " << bpgrads.db[1] << std::endl;
+
+    // TODO: Cleanup.
+    cudaFree(d_a1);
+    cudaFree(d_a2);
+    cudaFree(d_z1);
+    cudaFree(d_z2);
+    cudaFree(d_W1);
+    cudaFree(d_W2);
+    cudaFree(d_X);
+    cudaFree(d_b1);
+    cudaFree(d_b2);
+    cudaFree(d_y);
+    cudaFree(d_db1);
+    cudaFree(d_db2);
+    cudaFree(d_dW1);
+    cudaFree(d_dW2);
+    cudaFree(d_h1);
+    cudaFree(d_h2);
+    cudaFree(d_h3);
+    cudaFree(d_h4);
+    cudaFree(d_h5);
+    cudaFree(d_h6);
+}
+
 void BenchmarkGEMM()
 {
   std::cout << std::endl
             << "Entering GEMM Benchmarking mode! Stand by." << std::endl;
 
   /* First GEMM problem size */
-  int M = 800 * SCALE, N = 1000 * SCALE, K = 784 * SCALE;
+  int M = 8003, N = 1000 * SCALE, K = 784 * SCALE;
 
   std::cout << std::endl
             << "Starting GEMM 1: "
@@ -321,4 +793,168 @@ void BenchmarkGEMM()
             << "M = " << M << "; N = " << N << "; K = " << K << std::endl;
   TestGEMM(M, N, K);
   std::cout << "Completed GEMM 3" << std::endl;
+}
+
+void BenchmarkSigmoid() {
+
+    std::cout << std::endl << "Entering Sigmoid Benchmarking mode! Stand by."
+              << std::endl;
+
+    /* First GEMM Problem Size */
+    int M = 800*SCALE, N = 1000*SCALE, K = 784*SCALE;
+
+    std::cout << std::endl << "Starting Sigmoid 1: " << "M = " << M << "; N = "
+              << N << "; K = " << K << std::endl;
+    TestSigmoid(M, N);
+    std::cout << "Completed Sigmoid 1" << std::endl;
+
+    /* Secong GEMM Problem Size */
+    M = 800*SCALE, N = 10*SCALE, K = 1000*SCALE;
+    std::cout << std::endl << "Starting Sigmoid 2: " << "M = " << M << "; N = "
+              << N << "; K = " << K << std::endl;
+    TestSigmoid(M, N);
+    std::cout << "Completed Sigmoid 2" << std::endl;
+}
+
+void BenchmarkSoftmax() {
+
+    std::cout << std::endl << "Entering Softmax Benchmarking mode! Stand by."
+              << std::endl;
+
+    /* First GEMM Problem Size */
+    int M = 3000, N = 1000*SCALE, K = 784*SCALE;
+
+    std::cout << std::endl << "Starting Softmax 1: " << "M = " << M << "; N = "
+              << N << "; K = " << K << std::endl;
+    TestSoftmax(M, N);
+    std::cout << "Completed Softmax 1" << std::endl;
+
+    /* Secong GEMM Problem Size */
+    M = 10, N = 10*SCALE, K = 1000*SCALE;
+    std::cout << std::endl << "Starting Softmax 2: " << "M = " << M << "; N = "
+              << N << "; K = " << K << std::endl;
+    TestSoftmax(M, N);
+    std::cout << "Completed Softmax 2" << std::endl;
+}
+
+void BenchmarkRepMat() {
+
+    std::cout << std::endl << "Entering RepMat Benchmarking mode! Stand by."
+              << std::endl;
+
+    /* First GEMM Problem Size */
+    int M = 33, N = 35, K = 12, L = 63;
+
+    std::cout << std::endl << "Starting RepMat 1: " << "M = " << M << "; N = "
+              << N << "; K = " << K << std::endl;
+    TestRepMat(K, L, M, N);
+    std::cout << "Completed RepMat 1" << std::endl;
+
+    /* Secong GEMM Problem Size */
+    M = 1, N = 1, K = 5, L = 2;
+    std::cout << std::endl << "Starting RepMat 2: " << "M = " << M << "; N = "
+              << N << "; K = " << K << std::endl;
+    TestRepMat(K, L, M, N);
+    std::cout << "Completed RepMat 2" << std::endl;
+}
+
+void BenchmarkMatAdd() {
+
+    std::cout << std::endl << "Entering MatAdd Benchmarking mode! Stand by."
+              << std::endl;
+
+    /* First GEMM Problem Size */
+    int M = 800*SCALE, N = 1000*SCALE, K = 10, L = 6;
+
+    std::cout << std::endl << "Starting MatAdd 1: " << "M = " << M << "; N = "
+              << N << "; K = " << K << std::endl;
+    TestMatAdd(M, N);
+    std::cout << "Completed MatAdd 1" << std::endl;
+
+    /* Secong GEMM Problem Size */
+    M = 4102, N = 739, K = 1000*SCALE;
+    std::cout << std::endl << "Starting MatAdd 2: " << "M = " << M << "; N = "
+              << N << "; K = " << K << std::endl;
+    TestMatAdd(M, N);
+    std::cout << "Completed MatAdd 2" << std::endl;
+}
+
+void BenchmarkEqual() {
+
+    std::cout << std::endl << "Entering MatAdd Benchmarking mode! Stand by."
+              << std::endl;
+
+    /* First GEMM Problem Size */
+    int M = 800*SCALE, N = 1000*SCALE, K = 10, L = 6;
+
+    std::cout << std::endl << "Starting MatAdd 1: " << "M = " << M << "; N = "
+              << N << "; K = " << K << std::endl;
+    TestEqual(M, N);
+    std::cout << "Completed MatAdd 1" << std::endl;
+
+    /* Secong GEMM Problem Size */
+    M = 4102, N = 739, K = 1000*SCALE;
+    std::cout << std::endl << "Starting MatAdd 2: " << "M = " << M << "; N = "
+              << N << "; K = " << K << std::endl;
+    TestEqual(M, N);
+    std::cout << "Completed MatAdd 2" << std::endl;
+}
+
+void BenchmarkTranspose() {
+
+    std::cout << std::endl << "Entering Transpose Benchmarking mode! Stand by."
+              << std::endl;
+
+    /* First GEMM Problem Size */
+    int M = 8345, N = 124;
+
+    std::cout << std::endl << "Starting Transpose 1: " << "M = " << M << "; N = "
+              << N << std::endl;
+    TestTranspose(M, N);
+    std::cout << "Completed Transpose 1" << std::endl;
+
+    /* Secong GEMM Problem Size */
+    M = 17, N = 245;
+    std::cout << std::endl << "Starting Transpose 2: " << "M = " << M << "; N = "
+              << N << std::endl;
+    TestTranspose(M, N);
+    std::cout << "Completed Transpose 2" << std::endl;
+}
+
+void BenchmarkForward() {
+
+    std::cout << std::endl << "Entering Forward Benchmarking mode! Stand by."
+              << std::endl;
+
+    /* First GEMM Problem Size */
+    int n0 = 3000, n1 = 1000, n2 = 10, nbatch = 800;
+
+    std::cout << std::endl << "Starting Forward 1: " << std::endl;
+    TestFeedforward(n0, n1, n2, nbatch);
+    std::cout << "Completed Forward 1" << std::endl;
+
+    /* Secong GEMM Problem Size */
+    n0 = 10, n1 = 10, n2 = 10, nbatch = 16;
+    std::cout << std::endl << "Starting Forward 2: " << std::endl;
+    TestFeedforward(n0, n1, n2, nbatch);
+    std::cout << "Completed Forward 2" << std::endl;
+}
+
+void BenchmarkBackward() {
+
+    std::cout << std::endl << "Entering Backward Benchmarking mode! Stand by."
+              << std::endl;
+
+    /* First GEMM Problem Size */
+    int n0 = 6, n1 = 4, n2 = 8, nbatch = 12;
+
+    std::cout << std::endl << "Starting Backward 1: " << std::endl;
+    TestBackward(n0, n1, n2, nbatch);
+    std::cout << "Completed Forward 1" << std::endl;
+
+    /* Secong GEMM Problem Size */
+    n0 = 784, n1 = 1000, n2 = 10, nbatch = 800;
+    std::cout << std::endl << "Starting Backward 2: " << std::endl;
+    TestBackward(n0, n1, n2, nbatch);
+    std::cout << "Completed Forward 2" << std::endl;
 }

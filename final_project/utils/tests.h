@@ -12,4 +12,20 @@ int checkNNErrors(NeuralNetwork& seq_nn, NeuralNetwork& par_nn,
 
 void BenchmarkGEMM();
 
+void BenchmarkSigmoid();
+
+void BenchmarkSoftmax();
+
+void BenchmarkRepMat();
+
+void BenchmarkMatAdd();
+
+void BenchmarkTranspose();
+
+void BenchmarkForward();
+
+void BenchmarkBackward();
+
+void BenchmarkEqual();
+
 #endif

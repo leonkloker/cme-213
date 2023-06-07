@@ -11,6 +11,10 @@
 
 bool file_exists(const std::string &name);
 
+void softmax(const arma::Mat<nn_real> &mat, arma::Mat<nn_real> &mat2);
+
+void sigmoid(const arma::Mat<nn_real> &mat, arma::Mat<nn_real> &mat2);
+
 template <class T>
 void load_cpu_data_test(T &arma_mat, std::stringstream &s)
 {
@@ -85,12 +89,15 @@ struct cache
   arma::Mat<nn_real> X;
   std::vector<arma::Mat<nn_real>> z;
   std::vector<arma::Mat<nn_real>> a;
-  arma::Mat<nn_real> yc;
+  arma::Mat<nn_real> yc; 
 };
 
 // Feedforward pass
 void feedforward(NeuralNetwork &nn, const arma::Mat<nn_real> &X,
                  struct cache &bpcache);
+
+void backprop(NeuralNetwork &nn, const arma::Mat<nn_real> &y, nn_real reg,
+              const struct cache &bpcache, struct grads &bpgrads);
 
 // Loss computation
 nn_real loss(NeuralNetwork &nn, const arma::Mat<nn_real> &yc,
