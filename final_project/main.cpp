@@ -17,16 +17,16 @@
 
 // TODO: edit the following to choose which directory you wish
 // to store your CPU results in.
-string cpu_save_dir = "./cpu_results";
+string cpu_save_dir = "./cpu_output";
 // TODO: directory where the CPU results should be loaded from.
-string cpu_load_dir = "./cpu_results";
+string cpu_load_dir = "./cpu_output";
 // TODO: path to the MNIST file location.
 string file_train_images = "./MNIST_DATA/train-images.idx3-ubyte";
 string file_train_labels = "./MNIST_DATA/train-labels.idx1-ubyte";
 string file_test_images = "./MNIST_DATA/t10k-images.idx3-ubyte";
 string file_test_labels = "./MNIST_DATA/t10k-labels.idx1-ubyte";
 
-string output_dir = "./Outputs";
+string output_dir = "Outputs";
 
 string grade_tag;
 string mpi_tag;
@@ -216,7 +216,8 @@ int main(int argc, char *argv[])
 
   arma::Mat<nn_real> x_test(IMAGE_SIZE, NUM_TEST);
   arma::Row<nn_real> label_test = arma::zeros<arma::Row<nn_real>>(NUM_TEST);
-  arma::Mat<nn_real> y_test = arma::zeros<arma::Mat<nn_real>>(NUM_CLASSES, NUM_TEST);
+  arma::Mat<nn_real> y_test =
+      arma::zeros<arma::Mat<nn_real>>(NUM_CLASSES, NUM_TEST);
 
   NeuralNetwork seq_nn(H);
   NeuralNetwork nn(H);

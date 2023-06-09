@@ -16,8 +16,6 @@ void BenchmarkSigmoid();
 
 void BenchmarkSoftmax();
 
-void BenchmarkRepMat();
-
 void BenchmarkMatAdd();
 
 void BenchmarkTranspose();
@@ -26,6 +24,6 @@ void BenchmarkForward();
 
 void BenchmarkBackward();
 
-void BenchmarkEqual();
+void BenchmarkMatAdd2();
 
 #endif

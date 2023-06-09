@@ -11,9 +11,20 @@
 int myGEMM(const nn_real* A, const nn_real* B, nn_real* C, nn_real alpha,
             nn_real beta, int M, int N, int K);
 
+int GEMM_forward(const nn_real *__restrict__ A, const nn_real *__restrict__ B, 
+        const nn_real *__restrict__ C, nn_real *__restrict__ D, int M, int N, int K);
+
+int GEMM_backward(const nn_real *__restrict__ A, const nn_real *__restrict__ B, 
+        const nn_real *__restrict__ C, nn_real *__restrict__ D, nn_real alpha, int M, int N, int K);
+
+int GEMM_Atrans(const nn_real *__restrict__ A, const nn_real *__restrict__ B, 
+        nn_real *__restrict__ C, int M, int N, int K);
+
 void sigmoid_gpu(const nn_real* mat, nn_real* mat2, int M, int N);
 
 void softmax_gpu(const nn_real* mat, nn_real* mat2, int M, int N);
+
+void softmax2_gpu(const float* mat, float* mat2, int M, int N);
 
 void repmat_gpu(const nn_real* mat, nn_real* mat2, int K, int L, int M, int N);
 
@@ -43,9 +54,17 @@ void scalarmult_gpu(nn_real* mat, nn_real alpha, int M, int N);
 __global__ void myGEMM_kernel(const nn_real* A, const nn_real* B, nn_real* C, nn_real alpha, 
 nn_real beta, int M, int N, int K);
 
+__global__ void GEMM_forward_kernel(const nn_real *A, const nn_real *B, const nn_real *C, 
+                                    nn_real* D, int M, int N, int K);
+
+__global__ void GEMM_backward_kernel(const nn_real *A, const nn_real *B, const nn_real* C,
+                                    nn_real* D, nn_real alpha, int M, int N, int K);
+
 __global__ void sigmoid_kernel(const nn_real *mat, nn_real *mat2, int N);
 
 __global__ void softmax_kernel(const nn_real *mat, nn_real *mat2, int M, int N);
+
+__global__ void softmax2_kernel(const float *mat, float *mat2, int M, int N);
 
 __global__ void repmat_kernel(const nn_real* mat, nn_real* mat2, int K, int L, int M, int N);
 
@@ -75,19 +94,19 @@ __global__ void avg_kernel(const nn_real* data, nn_real* res, int size, int M);
 
 __global__ void scalarmult_kernel(nn_real* mat, nn_real alpha, int size);
 
-void feedforward_gpu(int n0, int n1, int n2, int nbatch, nn_real* d_X,
+void feedforward2_gpu(int n0, int n1, int n2, int nbatch, nn_real* d_X,
     nn_real* d_W0, nn_real* d_W1, nn_real* d_b0, nn_real* d_b1, nn_real* d_a1, 
     nn_real* d_yc, nn_real* d_z1, nn_real* d_z2);
 
-void predict_gpu(nn_real* label, int n0, int n1, int n2, int nbatch, nn_real* d_X,
-    nn_real* d_W0, nn_real* d_W1, nn_real* d_b0, nn_real* d_b1, nn_real* d_a1, 
-    nn_real* d_yc, nn_real* d_z1, nn_real* d_z2);
+void feedforward_gpu(int n0, int n1, int n2, int nbatch, nn_real* d_X,
+    nn_real* d_W1, nn_real* d_W2, nn_real* d_b1, nn_real* d_b2, nn_real* d_a1, 
+    nn_real* d_a2, nn_real* d_z1, nn_real* d_z2);
 
 void backprop_gpu(int n0, int n1, int n2, int nbatch, nn_real* d_a2, nn_real* d_a1,
                     nn_real* d_z2, nn_real* d_z1, nn_real* d_W1, nn_real* d_W2, nn_real* d_X,
                     nn_real* d_b2, nn_real* d_b1, nn_real* d_y, nn_real* d_db1, nn_real* d_db2,
                     nn_real* d_dW1, nn_real* d_dW2, nn_real* d_h1, nn_real* d_h2, nn_real* d_h3, 
-                    nn_real* d_h4, nn_real* d_h5, nn_real* d_h6, nn_real reg, nn_real weight);
+                    nn_real reg, nn_real weight);
 
 void gradient_descent_gpu(int n0, int n1, int n2, 
                         nn_real* d_W1, nn_real* d_W2, nn_real* d_b1, nn_real* d_b2,

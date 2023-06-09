@@ -2,6 +2,7 @@
 
 #SBATCH --time=00:30:00
 #SBATCH --partition=CME
+#SBATCH --qos=cme
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=4
 #SBATCH --gres=gpu:4

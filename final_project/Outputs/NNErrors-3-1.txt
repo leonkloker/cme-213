@@ -2,11 +2,11 @@ Mismatches for W[0]
 No errors were found
 Mismatches for b[0]
 No errors were found
-Max norm of diff b/w seq and par: W[0]: 1.30842e-07, b[0]: 8.4556e-07
-l2  norm of diff b/w seq and par: W[0]: 1.49638e-07, b[0]: 5.22061e-07
+Max norm of diff b/w seq and par: W[0]: 1.2146e-07, b[0]: 7.68691e-07
+l2  norm of diff b/w seq and par: W[0]: 1.46847e-07, b[0]: 5.42302e-07
 Mismatches for W[1]
 No errors were found
 Mismatches for b[1]
 No errors were found
-Max norm of diff b/w seq and par: W[1]: 1.3909e-07, b[1]: 1.24937e-06
-l2  norm of diff b/w seq and par: W[1]: 1.37368e-07, b[1]: 1.22754e-06
+Max norm of diff b/w seq and par: W[1]: 1.36468e-07, b[1]: 6.94096e-07
+l2  norm of diff b/w seq and par: W[1]: 1.37044e-07, b[1]: 9.01223e-07
