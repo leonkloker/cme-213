@@ -299,15 +299,15 @@ void parallel_train(NeuralNetwork &nn, const arma::Mat<nn_real> &X,
   int mini_batch_size_alloc;
   {
     const int max_batch_size = batch_size;
-    mini_batch_size_alloc = max_batch_size / num_procs;
+    mini_batch_size_alloc = max_batch_size / num_procs + 1;
   }
 
   // Network dimensions
   int n0 = nn.H[0];
   int n1 = nn.H[1];
   int n2 = nn.H[2];
-  int nbatch;
-  int nminibatch;
+  int nbatch = batch_size;
+  int nminibatch = mini_batch_size_alloc;
 
   // Network parameters
   nn_real* d_W1, *d_W2, *d_b1, *d_b2;
@@ -315,8 +315,6 @@ void parallel_train(NeuralNetwork &nn, const arma::Mat<nn_real> &X,
   nn_real* d_dW1, *d_dW2, *d_db1, *d_db2;
   nn_real* d_h1, *d_h2, *d_h3, *d_h4, *d_h5, *d_h6;
   nn_real* d_X, *d_y;
-  nn_real* d_dW1_gather, *d_dW2_gather, *d_db1_gather, *d_db2_gather;
-  nn_real* d_weights;
 
   // Allocate memory
   cudaMalloc(&d_X, n0 * mini_batch_size_alloc * sizeof(nn_real));
@@ -339,11 +337,6 @@ void parallel_train(NeuralNetwork &nn, const arma::Mat<nn_real> &X,
   cudaMalloc(&d_h4, n1 * mini_batch_size_alloc * sizeof(nn_real));
   cudaMalloc(&d_h5, n1 * mini_batch_size_alloc * sizeof(nn_real));
   cudaMalloc(&d_h6, mini_batch_size_alloc * n0 * sizeof(nn_real));
-  cudaMalloc(&d_dW1_gather, n1 * n0 * num_procs * sizeof(nn_real));
-  cudaMalloc(&d_dW2_gather, n2 * n1 * num_procs * sizeof(nn_real));
-  cudaMalloc(&d_db1_gather, n1 * num_procs * sizeof(nn_real));
-  cudaMalloc(&d_db2_gather, n2 * num_procs * sizeof(nn_real));
-  cudaMalloc(&d_weights, num_procs * sizeof(nn_real));
 
   // Copy data to GPU
   cudaMemcpy(d_W1, nn.W[0].memptr(), n1 * n0 * sizeof(nn_real), cudaMemcpyHostToDevice);
@@ -357,11 +350,6 @@ void parallel_train(NeuralNetwork &nn, const arma::Mat<nn_real> &X,
   nn_real *dW2 = (nn_real*) malloc(n2 * n1 * sizeof(nn_real));
   nn_real *db1 = (nn_real*) malloc(n1 * sizeof(nn_real));
   nn_real *db2 = (nn_real*) malloc(n2 * sizeof(nn_real));
-  nn_real *dW1_gather = (nn_real*) malloc(n1 * n0 * num_procs * sizeof(nn_real));
-  nn_real *dW2_gather = (nn_real*) malloc(n2 * n1 * num_procs * sizeof(nn_real));
-  nn_real *db1_gather = (nn_real*) malloc(n1 * num_procs * sizeof(nn_real));
-  nn_real *db2_gather = (nn_real*) malloc(n2 * num_procs * sizeof(nn_real));
-  nn_real *weights = (nn_real*) malloc(num_procs * sizeof(nn_real));
 
   int *X_sendcounts = (int*) malloc(num_procs * sizeof(int));
   int *X_displs = (int*) malloc(num_procs * sizeof(int));
@@ -369,75 +357,68 @@ void parallel_train(NeuralNetwork &nn, const arma::Mat<nn_real> &X,
   int *y_displs = (int*) malloc(num_procs * sizeof(int));
   int X_recvcount;
   int y_recvcount;
+  nn_real weight;
 
   arma::Mat<nn_real> X_batch, y_batch, y_hat_batch(n2, mini_batch_size_alloc);
 
-  /* iter is a variable used to manage debugging. It increments in the inner
-     loop and therefore goes from 0 to epochs*num_batches */
   int iter = 0;
   int last_col = 0;
 
+  // +-*=+-*=+-*=+-*=+-*=+-*=+-*=+-*=+*-=+-*=+*-=+-*=+-*=+-*=+-*=+-*= //
+  //                         TRAINING LOOP                            //
+  // +-*=+-*=+-*=+-*=+-*=+-*=+-*=+-*=+*-=+-*=+*-=+-*=+-*=+-*=+-*=+-*= //
+
   for (int epoch = 0; epoch < epochs; ++epoch)
   {
+    
+    // +-*=+-*=+-*=+-*=+-*=+-*=+-*=+-*=+*-=+-*=+*-=+-*=+-*=+-*=+-*=+-*= //
+    //                      MINIBATCH HANDLING                          //
+    // +-*=+-*=+-*=+-*=+-*=+-*=+-*=+-*=+*-=+-*=+*-=+-*=+-*=+-*=+-*=+-*= //
 
-    for (int k = 0; k < num_procs - 1; k++){
-      X_sendcounts[k] = n0 * mini_batch_size_alloc;
-      X_displs[k] = k * n0 * mini_batch_size_alloc;
-      y_sendcounts[k] = n2 * mini_batch_size_alloc;
-      y_displs[k] = k * n2 * mini_batch_size_alloc;
-      weights[k] = (nn_real) X_sendcounts[k] / (n0 * batch_size);
+    if (rank == 0){
+      for (int k = 0; k < num_procs; k++){
+        nminibatch = get_mini_batch_size(batch_size, num_procs, k);
+        X_sendcounts[k] = n0 * nminibatch;
+        X_displs[k] = k == 0 ? 0 : X_displs[k - 1] + X_sendcounts[k - 1];
+        y_sendcounts[k] = n2 * nminibatch;
+        y_displs[k] = k == 0 ? 0 : y_displs[k - 1] + y_sendcounts[k - 1];
+      }
     }
 
-    X_sendcounts[num_procs - 1] = n0 * (batch_size - mini_batch_size_alloc * (num_procs - 1));
-    y_sendcounts[num_procs - 1] = n2 * (batch_size - mini_batch_size_alloc * (num_procs - 1));
-    X_displs[num_procs - 1] = (num_procs - 1) * n0 * mini_batch_size_alloc;
-    y_displs[num_procs - 1] = (num_procs - 1) * n2 * mini_batch_size_alloc;
-    weights[num_procs - 1] = (nn_real) X_sendcounts[num_procs - 1] / (n0 * batch_size);
-
-    X_recvcount = X_sendcounts[rank];
-    y_recvcount = y_sendcounts[rank];
-
-    nbatch = X_sendcounts[rank] / n0;
+    nbatch = get_mini_batch_size(batch_size, num_procs, rank);
+    weight = (nn_real) nbatch / batch_size;
+    X_recvcount = n0 * nbatch;
+    y_recvcount = n2 * nbatch;
 
     for (int batch = 0; batch < num_batches; ++batch)
     {
-      /*
-       * Possible implementation:
-       * 1. subdivide input batch of images and `MPI_scatter()' to each MPI node
-       * 2. compute each sub-batch of images' contribution to network
-       * coefficient updates
-       * 3. reduce the coefficient updates and broadcast to all nodes with
-       * `MPI_Allreduce()'
-       * 4. update local network coefficient at each node
-       */
 
       last_col = (batch + 1) * batch_size - 1;
- 
-      if ((batch + 1) * batch_size >= N)
+
+      if (last_col >= N)
       {
         last_col = N - 1;
         nbatch = N - batch * batch_size;
-        nminibatch = (N - batch * batch_size) / num_procs;
+        weight = (nn_real) get_mini_batch_size(nbatch, num_procs, rank) / nbatch;
 
-        for (int k = 0; k < num_procs - 1; k++){
-          X_sendcounts[k] = n0 * nminibatch;
-          X_displs[k] = k * n0 * nminibatch;
-          y_sendcounts[k] = n2 * nminibatch;
-          y_displs[k] = k * n0 * nminibatch;
-          weights[k] = (nn_real) X_sendcounts[k] / (n0 * nbatch);
+        if (rank == 0){
+          for (int k = 0; k < num_procs; k++){
+            nminibatch = get_mini_batch_size(nbatch, num_procs, k);
+            X_sendcounts[k] = n0 * nminibatch;
+            X_displs[k] = k == 0 ? 0 : X_displs[k - 1] + X_sendcounts[k - 1];
+            y_sendcounts[k] = n2 * nminibatch;
+            y_displs[k] = k == 0 ? 0 : y_displs[k - 1] + y_sendcounts[k - 1];
+          }
         }
 
-        X_sendcounts[num_procs - 1] = n0 * (nbatch - nminibatch * (num_procs - 1));
-        X_displs[num_procs - 1] = (num_procs - 1) * n0 * nminibatch;
-        y_sendcounts[num_procs - 1] = n2 * (nbatch - nminibatch * (num_procs - 1));
-        y_displs[num_procs - 1] = (num_procs - 1) * n2 * nminibatch;
-        weights[num_procs - 1] = (nn_real) X_sendcounts[num_procs - 1] / (n0 * nbatch);
-
-        X_recvcount = X_sendcounts[rank];
-        y_recvcount = y_sendcounts[rank];
-
-        nbatch = X_sendcounts[rank] / n0;
+        nbatch = get_mini_batch_size(nbatch, num_procs, rank);
+        X_recvcount = n0 * nbatch;
+        y_recvcount = n2 * nbatch;
       }
+      //std::cout << "rank: " << rank << " minibatchsize: " << nbatch << " weight: " << weight << std::endl;
+      // +-*=+-*=+-*=+-*=+-*=+-*=+-*=+-*=+*-=+-*=+*-=+-*=+-*=+-*=+-*=+-*= //
+      //                     MINIBATCH DISTRIBUTION                       //
+      // +-*=+-*=+-*=+-*=+-*=+-*=+-*=+-*=+*-=+-*=+*-=+-*=+-*=+-*=+-*=+-*= //
 
       if (rank == 0){
         X_batch = X.cols(batch * batch_size, last_col);
@@ -465,47 +446,21 @@ void parallel_train(NeuralNetwork &nn, const arma::Mat<nn_real> &X,
       
       backprop_gpu(n0, n1, n2, nbatch, d_a1, d_a2, d_z1, d_z2, d_W1, d_W2,
                   d_X, d_b1, d_b2, d_y, d_db1, d_db2, d_dW1, d_dW2, d_h1, d_h2,
-                  d_h3, d_h4, d_h5, d_h6, reg);
+                  d_h3, d_h4, d_h5, d_h6, reg, weight);
 
+      // +-*=+-*=+-*=+-*=+-*=+-*=+-*=+-*=+*-=+-*=+*-=+-*=+-*=+-*=+-*=+-*= //
+      //                         EXCHANGE GRADIENTS                       //
+      // +-*=+-*=+-*=+-*=+-*=+-*=+-*=+-*=+*-=+-*=+*-=+-*=+-*=+-*=+-*=+-*= //
+      
       cudaMemcpy(dW1, d_dW1, n1 * n0 * sizeof(nn_real), cudaMemcpyDeviceToHost);
       cudaMemcpy(dW2, d_dW2, n2 * n1 * sizeof(nn_real), cudaMemcpyDeviceToHost);
       cudaMemcpy(db1, d_db1, n1 * sizeof(nn_real), cudaMemcpyDeviceToHost);
       cudaMemcpy(db2, d_db2, n2 * sizeof(nn_real), cudaMemcpyDeviceToHost);
 
-      MPI_Gather(dW1, n1 * n0, MPI_FP, dW1_gather, n1 * n0, MPI_FP, 0, MPI_COMM_WORLD);
-      MPI_Gather(dW2, n2 * n1, MPI_FP, dW2_gather, n2 * n1, MPI_FP, 0, MPI_COMM_WORLD);
-      MPI_Gather(db1, n1, MPI_FP, db1_gather, n1, MPI_FP, 0, MPI_COMM_WORLD);
-      MPI_Gather(db2, n2, MPI_FP, db2_gather, n2, MPI_FP, 0, MPI_COMM_WORLD);
-      for (int k = 0; k < num_procs; k++){
-        std::cout << "TEST " <<rank <<" "<< k << " " << weights[k] << std::endl;
-      }
-      if (rank == 0){
-        cudaMemcpy(d_dW1_gather, dW1_gather, n1 * n0 * num_procs * sizeof(nn_real), cudaMemcpyHostToDevice);
-        cudaMemcpy(d_dW2_gather, dW2_gather, n2 * n1 * num_procs * sizeof(nn_real), cudaMemcpyHostToDevice);
-        cudaMemcpy(d_db1_gather, db1_gather, n1 * num_procs * sizeof(nn_real), cudaMemcpyHostToDevice);
-        cudaMemcpy(d_db2_gather, db2_gather, n2 * num_procs * sizeof(nn_real), cudaMemcpyHostToDevice);
-        cudaMemcpy(d_weights, weights, num_procs * sizeof(nn_real), cudaMemcpyHostToDevice);
-
-        avg_gpu(d_dW1_gather, d_weights, d_dW1, n1 * n0, num_procs);
-        avg_gpu(d_dW2_gather, d_weights, d_dW2, n2 * n1, num_procs);
-        avg_gpu(d_db1_gather, d_weights, d_db1, n1, num_procs);
-        avg_gpu(d_db2_gather, d_weights, d_db2, n2, num_procs);
-
-        /*avg_gpu(d_dW1_gather, d_dW1, n1 * n0, num_procs);
-        avg_gpu(d_dW2_gather, d_dW2, n2 * n1, num_procs);
-        avg_gpu(d_db1_gather, d_db1, n1, num_procs);
-        avg_gpu(d_db2_gather, d_db2, n2, num_procs);*/
-
-        cudaMemcpy(dW1, d_dW1, n1 * n0 * sizeof(nn_real), cudaMemcpyDeviceToHost);
-        cudaMemcpy(dW2, d_dW2, n2 * n1 * sizeof(nn_real), cudaMemcpyDeviceToHost);
-        cudaMemcpy(db1, d_db1, n1 * sizeof(nn_real), cudaMemcpyDeviceToHost);
-        cudaMemcpy(db2, d_db2, n2 * sizeof(nn_real), cudaMemcpyDeviceToHost);
-      }
-
-      MPI_Bcast(dW1, n1 * n0, MPI_FP, 0, MPI_COMM_WORLD);
-      MPI_Bcast(dW2, n2 * n1, MPI_FP, 0, MPI_COMM_WORLD);
-      MPI_Bcast(db1, n1, MPI_FP, 0, MPI_COMM_WORLD);
-      MPI_Bcast(db2, n2, MPI_FP, 0, MPI_COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, dW1, n1 * n0, MPI_FP, MPI_SUM, MPI_COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, dW2, n2 * n1, MPI_FP, MPI_SUM, MPI_COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, db1, n1, MPI_FP, MPI_SUM, MPI_COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, db2, n2, MPI_FP, MPI_SUM, MPI_COMM_WORLD);
 
       cudaMemcpy(d_dW1, dW1, n1 * n0 * sizeof(nn_real), cudaMemcpyHostToDevice);
       cudaMemcpy(d_dW2, dW2, n2 * n1 * sizeof(nn_real), cudaMemcpyHostToDevice);
@@ -598,8 +553,4 @@ void parallel_train(NeuralNetwork &nn, const arma::Mat<nn_real> &X,
   cudaFree(d_h4);
   cudaFree(d_h5);
   cudaFree(d_h6);
-  cudaFree(d_dW1_gather);
-  cudaFree(d_dW2_gather);
-  cudaFree(d_db1_gather);
-  cudaFree(d_db2_gather);
 }

@@ -714,7 +714,7 @@ void TestBackward(int n0, int n1, int n2, int nbatch) {
                     d_z1, d_z2, d_W1, d_W2, d_X,
                     d_b1, d_b2, d_y, d_db1, d_db2,
                     d_dW1, d_dW2, d_h1, d_h2, d_h3,
-                    d_h4, d_h5, d_h6, reg);
+                    d_h4, d_h5, d_h6, reg, 1.);
     
     //check_launch("backprop_gpu dummy");
 

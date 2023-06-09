@@ -200,6 +200,21 @@ __global__ void elemmultmat_kernel(const nn_real* mat, nn_real* mat2, nn_real al
     }
 }
 
+void scalarmult_gpu(nn_real* mat, nn_real alpha, int M, int N)
+{
+    scalarmult_kernel<<<ceil(M * N / 256.f), 256>>>(mat, alpha, M * N);
+}
+
+__global__ void scalarmult_kernel(nn_real* mat, nn_real alpha, int size)
+{
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+
+    while(idx < size){
+        mat[idx] = alpha * mat[idx];
+        idx += blockDim.x * gridDim.x;
+    }
+}
+
 /*
 Routine to calculate the transpose mat2 = mat1^T
 */
@@ -387,7 +402,7 @@ void backprop_gpu(int n0, int n1, int n2, int nbatch, nn_real* d_a1, nn_real* d_
                 nn_real* d_z1, nn_real* d_z2, nn_real* d_W1, nn_real* d_W2, nn_real* d_X,
                 nn_real* d_b1, nn_real* d_b2, nn_real* d_y, nn_real* d_db1, nn_real* d_db2,
                 nn_real* d_dW1, nn_real* d_dW2, nn_real* d_h1, nn_real* d_h2, nn_real* d_h3,
-                nn_real* d_h4, nn_real* d_h5, nn_real* d_h6, nn_real reg)
+                nn_real* d_h4, nn_real* d_h5, nn_real* d_h6, nn_real reg, nn_real weight)
 {
     // Calculate gradients in last layer
     addmat_gpu(d_a2, d_y, d_h1, 1.f / nbatch, -1.f / nbatch, n2, nbatch);
@@ -406,6 +421,12 @@ void backprop_gpu(int n0, int n1, int n2, int nbatch, nn_real* d_a1, nn_real* d_
 
     myGEMM(d_h5, d_h6, d_dW1, 1.0, reg, n1, n0, nbatch);
     sum_axis1_gpu(d_h5, d_db1, n1, nbatch);
+    
+    // Rescale gradients according to batch size weight
+    scalarmult_gpu(d_dW1, weight, n1, n0);
+    scalarmult_gpu(d_dW2, weight, n2, n1);
+    scalarmult_gpu(d_db1, weight, n1, 1);
+    scalarmult_gpu(d_db2, weight, n2, 1);
 }
 
 /*
