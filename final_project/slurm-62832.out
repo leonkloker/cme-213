@@ -1,30 +1,0 @@
-WARNING: CPU IP/backtrace sampling not supported, disabling.
-Try the 'nsys status --environment' command to learn more.
-
-WARNING: CPU context switch tracing not supported, disabling.
-Try the 'nsys status --environment' command to learn more.
-
-Number of MPI processes         4
-Number of CUDA devices          4
-Grading mode off
-Number of neurons              32
-Number of epochs                1
-Batch size                     32
-Regularization      9.9999997e-05
-Learning rate               0.001
-The sequential code is not run
-The debug option is off
-Loading training data
-Training data information:
-Size of x_train, N =  60000
-Size of label_train = 60000
-Loading testing data
-
-Start Parallel Training
-Time for Parallel Training: 1.63135 seconds
-Precision on validation set for parallel training =   0.7316666841506958
-Precision on testing set for parallel training =   0.7175999879837036
-Generating '/tmp/nsys-report-0d87.qdstrm'
-[1/1] [0%                          ] nsys.nsys-rep[1/1] [0%                          ] nsys.nsys-rep[1/1] [5%                          ] nsys.nsys-rep[1/1] [10%                         ] nsys.nsys-rep[1/1] [=========45%                ] nsys.nsys-rep[1/1] [===================81%      ] nsys.nsys-rep[1/1] [====================84%     ] nsys.nsys-rep[1/1] [=====================87%    ] nsys.nsys-rep[1/1] [=====================88%    ] nsys.nsys-rep[1/1] [=====================89%    ] nsys.nsys-rep[1/1] [======================90%   ] nsys.nsys-rep[1/1] [======================91%   ] nsys.nsys-rep[1/1] [======================92%   ] nsys.nsys-rep[1/1] [=======================93%  ] nsys.nsys-rep[1/1] [=======================94%  ] nsys.nsys-rep[1/1] [=======================95%  ] nsys.nsys-rep[1/1] [========================97% ] nsys.nsys-rep[1/1] [========================98% ] nsys.nsys-rep[1/1] [========================99% ] nsys.nsys-rep[1/1] [========================100%] nsys.nsys-rep[1/1] [0%                          ] nsys.nsys-rep[1/1] [6%                          ] nsys.nsys-rep[1/1] [5%                          ] nsys.nsys-rep[1/1] [6%                          ] nsys.nsys-rep[1/1] [5%                          ] nsys.nsys-rep[1/1] [7%                          ] nsys.nsys-rep[1/1] [11%                         ] nsys.nsys-rep[1/1] [14%                         ] nsys.nsys-rep[1/1] [=17%                        ] nsys.nsys-rep[1/1] [==21%                       ] nsys.nsys-rep[1/1] [===24%                      ] nsys.nsys-rep[1/1] [====27%                     ] nsys.nsys-rep[1/1] [=====30%                    ] nsys.nsys-rep[1/1] [======34%                   ] nsys.nsys-rep[1/1] [=======37%                  ] nsys.nsys-rep[1/1] [========40%                 ] nsys.nsys-rep[1/1] [=========43%                ] nsys.nsys-rep[1/1] [=========46%                ] nsys.nsys-rep[1/1] [==========49%               ] nsys.nsys-rep[1/1] [===========52%              ] nsys.nsys-rep[1/1] [============55%             ] nsys.nsys-rep[1/1] [=============59%            ] nsys.nsys-rep[1/1] [==============62%           ] nsys.nsys-rep[1/1] [===============65%          ] nsys.nsys-rep[1/1] [================69%         ] nsys.nsys-rep[1/1] [=================72%        ] nsys.nsys-rep[1/1] [==================75%       ] nsys.nsys-rep[1/1] [========================100%] nsys.nsys-rep[1/1] [========================100%] nsys.nsys-rep
-Generated:
-    /home/leonkl/cme-213/final_project/nsys.nsys-rep

@@ -487,14 +487,14 @@ void train(NeuralNetwork &nn, const arma::Mat<nn_real> &X,
       }
       if (debug && rank == 0 && print_flag)
       {
-        cudaMemcpy(nn.W[0].memptr(), d_W1, n1 * n0 * sizeof(nn_real), cudaMemcpyDeviceToHost);
+        /*cudaMemcpy(nn.W[0].memptr(), d_W1, n1 * n0 * sizeof(nn_real), cudaMemcpyDeviceToHost);
         cudaMemcpy(nn.W[1].memptr(), d_W2, n2 * n1 * sizeof(nn_real), cudaMemcpyDeviceToHost);
         cudaMemcpy(nn.b[0].memptr(), d_b1, n1 * sizeof(nn_real), cudaMemcpyDeviceToHost);
         cudaMemcpy(nn.b[1].memptr(), d_b2, n2 * sizeof(nn_real), cudaMemcpyDeviceToHost);
 
         /* The following debug routine assumes that you have already updated the
          arma matrices in the NeuralNetwork nn.  */
-        save_gpu_error(nn, iter, error_file);
+        //save_gpu_error(nn, iter, error_file);
       }
 
       sample += nminibatch;

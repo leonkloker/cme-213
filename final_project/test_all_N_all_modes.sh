@@ -37,7 +37,7 @@ for mode in 1 2 3; do
   for N in 1 2 3 4; do 
 
     echo -e "\n\nmpirun -np ${N} ./main -d -g ${mode}"
-    mpirun -np ${N} ./main -d -g ${mode}
+    mpirun -np ${N} ./main -g ${mode}
 
     if [ ! -d ${GPU_ARCHIVE_DIR} ]; then
       mkdir ${GPU_ARCHIVE_DIR}

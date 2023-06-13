@@ -9,8 +9,9 @@ __global__ void elementwise_add(const int *x, const int *y,
                                 unsigned int size) {
     
     size_t id = blockIdx.x * blockDim.x + threadIdx.x;
-    if (id < size){
+    while(id < size){
         z[id * stride] = x[id * stride] + y[id * stride];
+        id += blockDim.x * gridDim.x;
     }
 
     // z[i * stride] = x[i * stride] + y[i * stride]
