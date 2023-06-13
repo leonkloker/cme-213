@@ -134,7 +134,6 @@ __global__ void GEMM_backward_kernel(const nn_real *A, const nn_real *B, const n
     }
 }
 
-
 /*
 Kernel called to calculate the matrix multiplication D = A * B + repmat(C, 1, N)
 */

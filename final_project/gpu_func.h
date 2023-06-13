@@ -17,16 +17,9 @@ int GEMM_forward(const nn_real *__restrict__ A, const nn_real *__restrict__ B,
 int GEMM_backward(const nn_real *__restrict__ A, const nn_real *__restrict__ B, 
         const nn_real *__restrict__ C, nn_real *__restrict__ D, nn_real alpha, int M, int N, int K);
 
-int GEMM_Atrans(const nn_real *__restrict__ A, const nn_real *__restrict__ B, 
-        nn_real *__restrict__ C, int M, int N, int K);
-
 void sigmoid_gpu(const nn_real* mat, nn_real* mat2, int M, int N);
 
 void softmax_gpu(const nn_real* mat, nn_real* mat2, int M, int N);
-
-void softmax2_gpu(const float* mat, float* mat2, int M, int N);
-
-void repmat_gpu(const nn_real* mat, nn_real* mat2, int K, int L, int M, int N);
 
 void addmat_gpu(const nn_real* mat, nn_real* mat2, nn_real* mat3, 
                 nn_real alpha, nn_real beta, int M, int N);
@@ -35,19 +28,11 @@ void elemmultmat_gpu(const nn_real* mat, nn_real* mat2, nn_real alpha, int M, in
 
 void transpose_gpu(const nn_real* mat, nn_real* mat2, int M, int N);
 
-void equal_gpu(const nn_real* mat, nn_real* mat2, int M, int N);
-
 void sum_axis1_gpu(const nn_real* mat, nn_real* mat2, int M, int N);
 
 void scalaradd_gpu(const nn_real* mat, nn_real* mat2, int M, int N, nn_real alpha, nn_real beta);
 
-void setzero_gpu(nn_real* mat, int M, int N);
-
 void softmax_der_gpu(const nn_real* mat, const nn_real* mat2, nn_real* mat3, int M, int N);
-
-void avg_gpu(const nn_real* data, const nn_real* weights, nn_real* res, int size, int M);
-
-void avg_gpu(const nn_real* data, nn_real* res, int size, int M);
 
 void scalarmult_gpu(nn_real* mat, nn_real alpha, int M, int N);
 
@@ -64,10 +49,6 @@ __global__ void sigmoid_kernel(const nn_real *mat, nn_real *mat2, int N);
 
 __global__ void softmax_kernel(const nn_real *mat, nn_real *mat2, int M, int N);
 
-__global__ void softmax2_kernel(const float *mat, float *mat2, int M, int N);
-
-__global__ void repmat_kernel(const nn_real* mat, nn_real* mat2, int K, int L, int M, int N);
-
 __global__ void addmat_kernel(const nn_real* mat, nn_real* mat2, nn_real* mat3,
                                 nn_real alpha, nn_real beta, int size);
                             
@@ -75,28 +56,14 @@ __global__ void elemmultmat_kernel(const nn_real* mat, nn_real* mat2, nn_real al
 
 __global__ void transpose_kernel(const nn_real* mat, nn_real* mat2, int M, int N);
 
-__global__ void equal_kernel(const nn_real* mat, nn_real* mat2, int M, int N);
-
 __global__ void sum_axis1_kernel(const nn_real* mat, nn_real* mat2, int M, int N);
 
 __global__ void scalaradd_kernel(const nn_real* mat, nn_real* mat2, int M, int N, 
                             nn_real alpha, nn_real beta);
 
-__global__ void setzero_kernel(nn_real* mat, int M, int N);
-
 __global__ void softmax_der_kernel(const nn_real* mat, const nn_real* mat2, nn_real* mat3, int M, int N);
 
-__global__ void argmax(const nn_real* values, nn_real* labels, int M, int N);
-
-__global__ void avg_kernel(const nn_real* data, const nn_real* weights, nn_real* res, int size, int M);
-
-__global__ void avg_kernel(const nn_real* data, nn_real* res, int size, int M);
-
 __global__ void scalarmult_kernel(nn_real* mat, nn_real alpha, int size);
-
-void feedforward2_gpu(int n0, int n1, int n2, int nbatch, nn_real* d_X,
-    nn_real* d_W0, nn_real* d_W1, nn_real* d_b0, nn_real* d_b1, nn_real* d_a1, 
-    nn_real* d_yc, nn_real* d_z1, nn_real* d_z2);
 
 void feedforward_gpu(int n0, int n1, int n2, int nbatch, nn_real* d_X,
     nn_real* d_W1, nn_real* d_W2, nn_real* d_b1, nn_real* d_b2, nn_real* d_a1, 
